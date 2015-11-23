@@ -130,14 +130,46 @@ void move(){
 }
 void par(float x1, float x2, float y1, float y2, float z1, float z2){
 	glColor3f(0.5, 0.0, 100.0);
+
 	glBegin(GL_QUADS);
-	
-	glVertex3f(x1, y1, z1);
-	glVertex3f(x2, y1, z1);
-	glVertex3f(x2, y2, z1);
-	glVertex3f(x1, y2, z1);
+		// draw front face
+		glVertex3f(x1, y2, z2);
+		glVertex3f(x2, y2, z2);
+		glVertex3f(x2, y2, z1);
+		glVertex3f(x1, y2, z1);
+
+		// draw back face
+		glVertex3f(x1, y1, z2);
+		glVertex3f(x2, y1, z2);
+		glVertex3f(x2, y1, z1);
+		glVertex3f(x1, y1, z1);
+
+		// draw left face
+		glVertex3f(x2, y2, z2);
+		glVertex3f(x2, y1, z2);
+		glVertex3f(x2, y1, z1);
+		glVertex3f(x2, y2, z1);
+
+		// draw right face
+		glVertex3f(x1, y2, z2);
+		glVertex3f(x1, y1, z2);
+		glVertex3f(x1, y1, z1);
+		glVertex3f(x1, y2, z1);
+
+		// draw top
+		glVertex3f(x1, y1, z2);
+		glVertex3f(x2, y1, z2);
+		glVertex3f(x2, y2, z2);
+		glVertex3f(x1, y2, z2);
+
+		// draw bottom
+		glVertex3f(x1, y1, z1);
+		glVertex3f(x2, y1, z1);
+		glVertex3f(x2, y2, z1);
+		glVertex3f(x1, y2, z1);
 
 	glEnd();
+	
 }
 
 void display(void)
@@ -147,18 +179,31 @@ void display(void)
 	glLoadIdentity ();
 
 	glTranslatef(0.0, 0.0, -22.0);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	glPushMatrix();
+
+		glRotatef(-45.0, 1.0, 0.0, 0.0);
+
+
+	
+
+	
 	int i;
 	sq *p = snake;
-	par(-8.7,  9.2,  9.0,  9.2, 0.0, 0.0);
-	par(-8.7,  9.2, -8.5, -8.7, 0.0, 0.0);
-	par(-8.5, -8.7, -8.7,  9.2, 0.0, 0.0);
-	par( 9.2,  9.0, -8.7,  9.2, 0.0, 0.0);
+	par(-8.7,  9.2,  9.0,  9.2, 0.0, 0.5);
+	par(-8.7,  9.2, -8.5, -8.7, 0.0, 0.5);
+	par(-8.5, -8.7, -8.7,  9.2, 0.0, 0.5);
+	par( 9.2,  9.0, -8.7,  9.2, 0.0, 0.5);
+
 	while(p != NULL){
-		par((p -> x)/2.0,(p -> x)/2.0 + 0.4,(p -> y)/2.0,(p -> y)/2.0 + 0.4, 0.0, 0.0);
+		par((p -> x)/2.0,(p -> x)/2.0 + 0.4,(p -> y)/2.0,(p -> y)/2.0 + 0.4, 0.0, 0.5);
 		p = p -> next;	
 	}
-	par(fx/2.0, fx/2.0 + 0.4 , fy/2.0 , fy/2.0 + 0.4, 0.0 , 0.0);
+	par(fx/2.0, fx/2.0 + 0.4 , fy/2.0 , fy/2.0 + 0.4, 0.0 , 0.5);
 	glutSwapBuffers();
+	glPopMatrix();
 }
 void myIdleFunc(int a) {
 	if(!p){
