@@ -17,8 +17,10 @@ using namespace std;
 typedef struct sq{
 	int x;
 	int y;
+	int z;
 	int mx;
 	int my;
+	int mz;
 	struct sq *next;
 } sq;
 
@@ -26,29 +28,34 @@ sq *snake;
 
 int mx;
 int my;
+int mz;
 int fx = -6;
 int fy = -6;
+int fz = 0;
 int sc = 0;
 bool p = false;
 
-void add(int x, int y){
+void add(int x, int y, int z){
 	sq *tmp = (sq *)malloc(sizeof(sq));
 	tmp -> x = x;
 	tmp -> y = y;
+	tmp -> z = z;
 	tmp -> mx = 1;
 	tmp -> my = 0;
+	tmp -> mz = 0;
 	tmp -> next = snake;
 	snake = tmp;
 }
 void start(){
 	snake = NULL;
-	add(0, 0);
-	add(1, 0);
-	add(2, 0);
-	add(3, 0);
-	add(4, 0);
+	add(0, 0, 0);
+	add(1, 0, 0);
+	add(2, 0, 0);
+	add(3, 0, 0);
+	add(4, 0, 0);
 	mx = 1;
 	my = 0;
+	mz = 0;
 }
 void set_f(){
 	bool f = true;
@@ -59,7 +66,7 @@ void set_f(){
 		fy = (rand() % 34) - 17;
 		sq *p = snake;
 		while(p != NULL){
-			if(p -> x == fx && p -> y == fy){
+			if(p -> x == fx && p -> y == fy && p -> z == fz){
 				f = true;
 				break;		
 			}	
@@ -71,7 +78,8 @@ void set_f(){
 bool tail(){
 	sq *p = snake;
 	while(p -> next != NULL){
-		if(p -> next -> x == snake -> x + mx && p -> next -> y == snake -> y + my)
+		if(p -> next -> x == snake -> x + mx && p -> next -> y == snake -> y + my
+			&& p -> next -> z == snake -> z + mz)
 			return true;	
 		p = p -> next;
 	}
@@ -84,8 +92,10 @@ void rev(){
 		sq *tmp = (sq *)malloc(sizeof(sq));
 		tmp -> x = p -> x;
 		tmp -> y = p -> y;
+		tmp -> z = p -> z;
 		tmp -> mx = -1 * p -> mx;
 		tmp -> my = -1 * p -> my;
+		tmp -> mz = -1 * p -> mz;
 		tmp -> next = snake2;
 		snake2 = tmp;
 		sq *x = p -> next;
@@ -95,14 +105,17 @@ void rev(){
 	snake = snake2;
 	mx = snake -> mx;
 	my = snake -> my;
+	mz = snake -> mz;
 }
 
 void move(){
 	sq *p = snake;
 	int x = p -> x;
 	int y = p -> y;
+	int z = p -> z;
 	int tmx = p -> mx;
 	int tmy = p -> my;
+	int tmz = p -> mz;
 	while(p -> next != NULL){
 		sq *q = p -> next;
 		int tmp = q -> x;
@@ -113,6 +126,10 @@ void move(){
 		q -> y = y;
 		y = tmp;
 
+		tmp = q -> z;
+		q -> z = z;
+		z = tmp;
+
 		tmp = q -> mx;
 		q -> mx = tmx;
 		tmx = tmp;
@@ -121,12 +138,18 @@ void move(){
 		q -> my = tmy;
 		tmy = tmp;
 
+		tmp = q -> mz;
+		q -> mz = tmz;
+		tmz = tmp;
+
 		p = p -> next;
 	}
 	snake -> mx = mx;
 	snake -> my = my;
+	snake -> mz = mz;
 	snake -> x += mx;
 	snake -> y += my;
+	snake -> z += mz;
 }
 void par(float x1, float x2, float y1, float y2, float z1, float z2){
 	glColor3f(0.5, 0.0, 100.0);
@@ -198,10 +221,10 @@ void display(void)
 	par( 9.2,  9.0, -8.7,  9.2, 0.0, 0.5);
 
 	while(p != NULL){
-		par((p -> x)/2.0,(p -> x)/2.0 + 0.4,(p -> y)/2.0,(p -> y)/2.0 + 0.4, 0.0, 0.5);
+		par((p -> x)/2.0,(p -> x)/2.0 + 0.4,(p -> y)/2.0,(p -> y)/2.0 + 0.4, (p -> z)/2.0,(p -> z)/2.0 + 0.4);
 		p = p -> next;	
 	}
-	par(fx/2.0, fx/2.0 + 0.4 , fy/2.0 , fy/2.0 + 0.4, 0.0 , 0.5);
+	par(fx/2.0, fx/2.0 + 0.4 , fy/2.0 , fy/2.0 + 0.4, fz/2.0 , fz/2.0 + 0.4);
 	glutSwapBuffers();
 	glPopMatrix();
 }
@@ -217,7 +240,7 @@ void myIdleFunc(int a) {
 			exit(0);
 		}else{
 			if(snake -> x + mx == fx && snake -> y + my == fy){
-				add(fx, fy);	
+				add(fx, fy, fz);	
 				sc++;
 				set_f();
 			}
@@ -237,6 +260,7 @@ void keyboard(unsigned char key, int x, int y)
 			else{
 				mx = -1;
 				my =  0;
+				mz =  0;
 			}	
 		}
 	}else if((char)key == 'd'){
@@ -245,6 +269,7 @@ void keyboard(unsigned char key, int x, int y)
 			else{
 				mx =  1;
 				my =  0;
+				mz =  0;
 			}
 		}
 	}else if((char)key == 'w'){
@@ -253,6 +278,7 @@ void keyboard(unsigned char key, int x, int y)
 			else{
 				mx =  0;
 				my =  1;
+				mz =  0;
 			}
 		}	
 	}else if((char)key == 's'){
@@ -261,6 +287,25 @@ void keyboard(unsigned char key, int x, int y)
 			else{
 				mx =  0;
 				my = -1;
+				mz =  0;
+			}
+		}
+	}else if((char)key == 'q'){
+		if(!p){		
+			if(mz == -1) rev();
+			else{
+				mx =  0;
+				my =  0;
+				mz =  1;
+			}
+		}
+	}else if((char)key == 'e'){
+		if(!p){		
+			if(mz == 1) rev();
+			else{
+				mx =  0;
+				my =  0;
+				mz = -1;
 			}
 		}
 	}else if((char)key == 'p'){
@@ -289,8 +334,8 @@ void Reshape(int w, int h)
 {
     	glViewport(0, 0, w, h);
     	glMatrixMode(GL_PROJECTION); 
-	glLoadIdentity();
-	gluPerspective(45.0, (float)w/(float)h, 0.1, 200.0);
+		glLoadIdentity();
+		gluPerspective(45.0, (float)w/(float)h, 0.1, 200.0);
 	
 }
 int main(int argc, char** argv)
