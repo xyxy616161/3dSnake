@@ -363,7 +363,7 @@ void myIdleFunc(int a) {
 		move();
 		glutPostRedisplay();
 	}
-	glutTimerFunc(400, myIdleFunc, 0);
+	glutTimerFunc(100, myIdleFunc, 0);
 }
 void keyboard(unsigned char key, int x, int y)
 {
