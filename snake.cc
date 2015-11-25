@@ -398,88 +398,83 @@ void keyboard(unsigned char key, int x, int y)
 		exit(0);	
 	}else if((char)key == 'a'){
 		if(!p){
-			if(mx == 1) rev();
-			else{
-				if (current_face == 0) {
-					mx = -1;
-					my =  0;
-					mz =  0;
-				}
-				else if (current_face == 1) {
-					mx = 0;
-					my = 0;
-					mz = 1;
-				}
-				else if (current_face == 3) {
-					mx = 0;
-					my = 0;
-					mz = -1;
-				}
-			}	
-		}
-	}else if((char)key == 'd'){
-		if(!p){
-			if(mx == -1) rev();
-			else{
-				if (current_face == 0) {
-					mx =  1;
-					my =  0;
-					mz =  0;
-				}
-				else if (current_face == 1) {
-					mx = 0;
-					my = 0;
-					mz = -1;
-				}
-				else if (current_face == 3) {
-					mx = 0;
-					my = 0;
-					mz = 1;
-				}
+			
+			if ( (current_face == 0) && (mx != 1) ) {
+				mx = -1;
+				my =  0;
+				mz =  0;
 			}
-		}
-	}else if((char)key == 'w'){
-		if(!p){
-			if(my == -1) rev();
-			else{
-				if (current_face == 0) {
-					mx =  0;
-					my =  1;
-					mz =  0;
-				}
-				else if (current_face == 1) {
-					mx = 0;
-					my = 1;
-					mz = 0;
-				}
-				else if (current_face == 3) {
-					mx = 0;
-					my = 1;
-					mz = 0;
-				}
+			else if ((current_face == 1) && (mz != -1)) {
+				mx = 0;
+				my = 0;
+				mz = 1;
+			}
+			else if ((current_face == 3) && (mz != 1)) {
+				mx = 0;
+				my = 0;
+				mz = -1;
 			}
 		}	
-	}else if((char)key == 's'){
-		if(!p){		
-			if(my == 1) rev();
-			else{
-				if (current_face == 0) {
-					mx =  0;
-					my =  -1;
-					mz =  0;
-				}
-				else if (current_face == 1) {
-					mx = 0;
-					my = -1;
-					mz = 0;
-				}
-				else if (current_face == 3) {
-					mx = 0;
-					my = -1;
-					mz = 0;
-				}
+	}else if((char)key == 'd'){
+		if(!p){
+			
+			if ( (current_face == 0) && (mx != -1) ) {
+				mx =  1;
+				my =  0;
+				mz =  0;
+			}
+			else if ((current_face == 1) && (mz != 1)) {
+				mx = 0;
+				my = 0;
+				mz = -1;
+			}
+			else if ((current_face == 3) && (mz != -1)) {
+				mx = 0;
+				my = 0;
+				mz = 1;
 			}
 		}
+		
+	}else if((char)key == 'w'){
+		if(!p){
+			
+			if ( (current_face == 0) && (my != -1) ) {
+				mx =  0;
+				my =  1;
+				mz =  0;
+			}
+			else if ((current_face == 1) && (my != -1)) {
+				mx = 0;
+				my = 1;
+				mz = 0;
+			}
+			else if ((current_face == 3) && (my != -1)) {
+				mx = 0;
+				my = 1;
+				mz = 0;
+			}
+		}
+			
+	}else if((char)key == 's'){
+		if(!p){		
+			
+			if ( (current_face == 0) && (my != 1) ) {
+				mx =  0;
+				my =  -1;
+				mz =  0;
+			}
+			else if ( (current_face == 1) && (my != 1) ) {
+				mx = 0;
+				my = -1;
+				mz = 0;
+			}
+			else if ( (current_face == 3) && (my != 1) ) {
+				mx = 0;
+				my = -1;
+				mz = 0;
+			}
+		}
+		
 	}else if((char)key == 'p'){
 		if(p) p = false;
 		else p = true;	
