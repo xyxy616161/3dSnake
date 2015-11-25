@@ -21,6 +21,7 @@ typedef struct sq{
 	int mx;
 	int my;
 	int mz;
+	
 	struct sq *next;
 } sq;
 
@@ -29,13 +30,14 @@ sq *snake;
 int mx;
 int my;
 int mz;
-int change_view_z = 0;
 
 int fx = -6;
 int fy = -6;
-int fz = 0;
+int fz = 7;
 int sc = 0;
 bool p = false;
+
+int current_face = 0; //0 for default
 
 
 void add(int x, int y, int z){
@@ -51,11 +53,11 @@ void add(int x, int y, int z){
 }
 void start(){
 	snake = NULL;
-	add(0, 0, 0);
-	add(1, 0, 0);
-	add(2, 0, 0);
-	add(3, 0, 0);
-	add(4, 0, 0);
+	add(0, 0, 7);
+	add(1, 0, 7);
+	add(2, 0, 7);
+	add(3, 0, 7);
+	add(4, 0, 7);
 	mx = 1;
 	my = 0;
 	mz = 0;
@@ -82,7 +84,7 @@ bool tail(){
 	sq *p = snake;
 	while(p -> next != NULL){
 		if(p -> next -> x == snake -> x && p -> next -> y == snake -> y
-			&& p -> next -> z == snake -> z )
+			&& p -> next -> z == snake -> z)
 			return true;	
 		p = p -> next;
 	}
@@ -119,6 +121,7 @@ void move(){
 	int tmx = p -> mx;
 	int tmy = p -> my;
 	int tmz = p -> mz;
+
 	while(p -> next != NULL){
 		sq *q = p -> next;
 		int tmp = q -> x;
@@ -147,12 +150,14 @@ void move(){
 
 		p = p -> next;
 	}
+
 	snake -> mx = mx;
 	snake -> my = my;
 	snake -> mz = mz;
 	snake -> x += mx;
 	snake -> y += my;
 	snake -> z += mz;
+
 	if (snake -> y >= 7){
 		snake -> y = -7;
 	}
@@ -160,16 +165,25 @@ void move(){
 		snake -> y = 6;
 	}
 
+	if ( (current_face == 0) && (snake->x >= 7) ) {
+		current_face = 1;
+		mx = 0;
+		my = 0;
+		mz = -1;
+	}
+	else if ( (current_face == 1) && (snake->z >= 7) ){
+		current_face = 0;
+		mx = -1;
+		my = 0;
+		mz = 0;
+	}
+
 }
 
 
 void drawmap(){
 		glColor3f(0.5, 0.0, 100.0);
-		// draw back face
-		// glVertex3f(7, -7, -7);
-		// glVertex3f(-7, -7,-7);
-		// glVertex3f(-7, -7,7);
-		// glVertex3f(7, -7, 7);
+
 		for (int x = -7; x <= 7; x++) {
 			glBegin(GL_LINE_LOOP);
 			glVertex3f(x, -7, -7);
@@ -183,11 +197,6 @@ void drawmap(){
 			glEnd();
 		}
 
-	// 	// draw front face
-	// 	glVertex3f(7, 7, -7);
-	// 	glVertex3f(-7, 7, -7);
-	// 	glVertex3f(-7, 7, 7);
-	// 	glVertex3f(7, 7, 7);
 		for (int x = -7; x <= 7; x++) {
 			glBegin(GL_LINE_LOOP);
 			glVertex3f(x, -7, 7);
@@ -201,11 +210,6 @@ void drawmap(){
 			glEnd();
 		}
 
-	// 	// draw left face
-	// 	glVertex3f(-7, -7, -7);
-	// 	glVertex3f(-7, 7, -7);
-	// 	glVertex3f(-7, 7, 7);
-	// 	glVertex3f(-7, -7, 7);
 		for (int x = -7; x <= 7; x++) {
 			glBegin(GL_LINE_LOOP);
 			glVertex3f(-7, x, -7);
@@ -219,11 +223,7 @@ void drawmap(){
 			glEnd();
 		}
 
-	// 	// draw right face
-	// 	glVertex3f(7, -7, -7);
-	// 	glVertex3f(7, 7, -7);
-	// 	glVertex3f(7, 7, 7);
-	// 	glVertex3f(7, -7, 7);
+
 		for (int x = -7; x <= 7; x++) {
 			glBegin(GL_LINE_LOOP);
 			glVertex3f(7, x, -7);
@@ -236,20 +236,6 @@ void drawmap(){
 			glVertex3f(7, 7, x);
 			glEnd();
 		}
-
-	// 	// draw top
-	// 	glVertex3f(7, 7, -7);
-	// 	glVertex3f(-7, 7, -7);
-	// 	glVertex3f(-7, -7, -7);
-	// 	glVertex3f(7, -7, -7);
-
-	// 	// draw bottom
-	// 	glVertex3f(7, 7, 7);
-	// 	glVertex3f(-7, 7, 7);
-	// 	glVertex3f(-7, -7, 7);
-	// 	glVertex3f(7, -7, 7);
-
-	// glEnd();
 
 }
 
@@ -308,27 +294,43 @@ void display(void)
 	glLoadIdentity ();
 	glTranslatef(0.0, 0.0, -40.0);
 
+	//rotate around Y axis
+	if (current_face == 0) {
+		glRotatef(snake->y * 6.43, 1.0, 0.0, 0.0);
+		glRotatef(-snake->x * 6.43, 0.0, 1.0, 0.0);
+		
+	}
+	else if (current_face == 1) {
+		glRotatef(-90 , 0.0, 1.0, 0.0);
+		glRotatef(snake->z * 6.43, 0.0, 1.0, 0.0);
+		glRotatef(-snake->y * 6.43, 0.0, 0.0, 1.0);
+		
+	}
+	
+
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glPushMatrix();
 		drawmap();
 		glPushMatrix();
 		
-		
 
-
-		
-
-	
 	int i;
 	sq *p = snake;
 	
 
 	while(p != NULL){
-		par((p -> x),(p -> x) + 1,(p -> y),(p -> y) + 1, 7, 7.0);
-		p = p -> next;	
+		if (current_face == 0){
+			par((p -> x),(p -> x) + 1,(p -> y),(p -> y) + 1, p -> z, p -> z );
+			p = p -> next;
+		}
+		else if (current_face == 1){
+			par((p -> x),(p -> x),(p -> y),(p -> y) + 1, p -> z, p -> z + 1);
+			p = p->next;
+		}
+			
 	}
-	par(fx, fx + 1 , fy , fy + 1, 7, 7.0);
+	par(fx, fx + 1 , fy , fy + 1, fz, fz);
 	glutSwapBuffers();
 	glPopMatrix();
 	glPopMatrix();
@@ -361,36 +363,64 @@ void keyboard(unsigned char key, int x, int y)
 		if(!p){
 			if(mx == 1) rev();
 			else{
-				mx = -1;
-				my =  0;
-				mz =  0;
+				if (current_face == 0) {
+					mx = -1;
+					my =  0;
+					mz =  0;
+				}
+				else if (current_face == 1) {
+					mx = 0;
+					my = 0;
+					mz = 1;
+				}
 			}	
 		}
 	}else if((char)key == 'd'){
 		if(!p){
 			if(mx == -1) rev();
 			else{
-				mx =  1;
-				my =  0;
-				mz =  0;
+				if (current_face == 0) {
+					mx =  1;
+					my =  0;
+					mz =  0;
+				}
+				else if (current_face == 1) {
+					mx = 0;
+					my = 0;
+					mz = -1;
+				}
 			}
 		}
 	}else if((char)key == 'w'){
 		if(!p){
 			if(my == -1) rev();
 			else{
-				mx =  0;
-				my =  1;
-				mz =  0;
+				if (current_face == 0) {
+					mx =  0;
+					my =  1;
+					mz =  0;
+				}
+				else if (current_face == 1) {
+					mx = 0;
+					my = 1;
+					mz = 0;
+				}
 			}
 		}	
 	}else if((char)key == 's'){
 		if(!p){		
 			if(my == 1) rev();
 			else{
-				mx =  0;
-				my = -1;
-				mz =  0;
+				if (current_face == 0) {
+					mx =  0;
+					my =  -1;
+					mz =  0;
+				}
+				else if (current_face == 1) {
+					mx = 0;
+					my = -1;
+					mz = 0;
+				}
 			}
 		}
 	}else if((char)key == 'p'){
