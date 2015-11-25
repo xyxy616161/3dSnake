@@ -179,11 +179,28 @@ void move(){
 		my = 0;
 		mz = -1;
 	}
-	else if ( (current_face == 1) && (snake->z >= 7) ){
+	else if ( (current_face == 1) && (snake->z >= 7) ) {
 		current_face = 0;
 		snake->snake_face = 0;
 		snake->x --;
 		mx = -1;
+		my = 0;
+		mz = 0;
+	}
+
+	else if ( (current_face == 0) && (snake->x <= -8) ) {
+		current_face = 3;
+		snake->snake_face = 3;
+		snake->z --;
+		snake->x ++;
+		mx = 0;
+		my = 0;
+		mz = -1;
+	}
+	else if ( (current_face == 3) && (snake->z >= 7) ) {
+		current_face = 0;
+		snake->snake_face = 0;
+		mx = 1;
 		my = 0;
 		mz = 0;
 	}
@@ -313,7 +330,13 @@ void display(void)
 	else if (current_face == 1) {
 		glRotatef(-90 , 0.0, 1.0, 0.0);
 		glRotatef(snake->z * 6.43, 0.0, 1.0, 0.0);
-		glRotatef(-snake->y * 6.43, 0.0, 0.0, 1.0);
+		glRotatef(-snake->y * 6.43, 0.0, 0.0, 1.0);	
+	}
+
+	else if (current_face == 3) {
+		glRotatef(90 , 0.0, 1.0, 0.0);
+		glRotatef(-snake->z * 6.43, 0.0, 1.0, 0.0);
+		glRotatef(snake->y * 6.43, 0.0, 0.0, 1.0);
 		
 	}
 	
@@ -335,6 +358,10 @@ void display(void)
 			p = p -> next;
 		}
 		else if (p->snake_face == 1){
+			par((p -> x),(p -> x),(p -> y),(p -> y) + 1, p -> z, p -> z + 1);
+			p = p->next;
+		}
+		else if (p->snake_face == 3) {
 			par((p -> x),(p -> x),(p -> y),(p -> y) + 1, p -> z, p -> z + 1);
 			p = p->next;
 		}
@@ -383,6 +410,11 @@ void keyboard(unsigned char key, int x, int y)
 					my = 0;
 					mz = 1;
 				}
+				else if (current_face == 3) {
+					mx = 0;
+					my = 0;
+					mz = -1;
+				}
 			}	
 		}
 	}else if((char)key == 'd'){
@@ -398,6 +430,11 @@ void keyboard(unsigned char key, int x, int y)
 					mx = 0;
 					my = 0;
 					mz = -1;
+				}
+				else if (current_face == 3) {
+					mx = 0;
+					my = 0;
+					mz = 1;
 				}
 			}
 		}
@@ -415,6 +452,11 @@ void keyboard(unsigned char key, int x, int y)
 					my = 1;
 					mz = 0;
 				}
+				else if (current_face == 3) {
+					mx = 0;
+					my = 1;
+					mz = 0;
+				}
 			}
 		}	
 	}else if((char)key == 's'){
@@ -427,6 +469,11 @@ void keyboard(unsigned char key, int x, int y)
 					mz =  0;
 				}
 				else if (current_face == 1) {
+					mx = 0;
+					my = -1;
+					mz = 0;
+				}
+				else if (current_face == 3) {
 					mx = 0;
 					my = -1;
 					mz = 0;
