@@ -30,12 +30,15 @@ sq *snake;
 int mx;
 int my;
 int mz;
+int change_view_z = 0;
+
 int fx = -6;
 int fy = -6;
 int fz = 0;
 int sc = 0;
 bool p = false;
 bool color = true;
+
 
 void add(int x, int y, int z){
 	sq *tmp = (sq *)malloc(sizeof(sq));
@@ -63,9 +66,9 @@ void set_f(){
 	bool f = true;
 	while(f){
 		srand(time(NULL));
-		fx = (rand() % 34) - 17;	 
+		fx = (rand() % 14) - 7;	 
 		srand(time(NULL));
-		fy = (rand() % 34) - 17;
+		fy = (rand() % 14) - 7;
 		sq *p = snake;
 		while(p != NULL){
 			if(p -> x == fx && p -> y == fy && p -> z == fz){
@@ -153,8 +156,113 @@ void move(){
 	snake -> x += mx;
 	snake -> y += my;
 	snake -> z += mz;
+	if (snake -> y >= 7){
+		snake -> y = -7;
+	}
+	if (snake -> y <= -8){
+		snake -> y = 6;
+	}
+
 }
-void par(float x1, float x2, float y1, float y2, float z1, float z2){	
+
+
+
+void drawmap(){
+		glColor3f(0.5, 0.0, 100.0);
+		// draw back face
+		// glVertex3f(7, -7, -7);
+		// glVertex3f(-7, -7,-7);
+		// glVertex3f(-7, -7,7);
+		// glVertex3f(7, -7, 7);
+		for (int x = -7; x <= 7; x++) {
+			glBegin(GL_LINE_LOOP);
+			glVertex3f(x, -7, -7);
+			glVertex3f(x, 7, -7);
+			glEnd();
+		}
+		for (int x = -7; x <= 7; x++) {
+			glBegin(GL_LINE_LOOP);
+			glVertex3f(-7, x, -7);
+			glVertex3f(7, x, -7);
+			glEnd();
+		}
+
+	// 	// draw front face
+	// 	glVertex3f(7, 7, -7);
+	// 	glVertex3f(-7, 7, -7);
+	// 	glVertex3f(-7, 7, 7);
+	// 	glVertex3f(7, 7, 7);
+		for (int x = -7; x <= 7; x++) {
+			glBegin(GL_LINE_LOOP);
+			glVertex3f(x, -7, 7);
+			glVertex3f(x, 7, 7);
+			glEnd();
+		}
+		for (int x = -7; x <= 7; x++) {
+			glBegin(GL_LINE_LOOP);
+			glVertex3f(-7, x, 7);
+			glVertex3f(7, x, 7);
+			glEnd();
+		}
+
+	// 	// draw left face
+	// 	glVertex3f(-7, -7, -7);
+	// 	glVertex3f(-7, 7, -7);
+	// 	glVertex3f(-7, 7, 7);
+	// 	glVertex3f(-7, -7, 7);
+		for (int x = -7; x <= 7; x++) {
+			glBegin(GL_LINE_LOOP);
+			glVertex3f(-7, x, -7);
+			glVertex3f(-7, x, 7);
+			glEnd();
+		}
+		for (int x = -7; x <= 7; x++) {
+			glBegin(GL_LINE_LOOP);
+			glVertex3f(-7, -7, x);
+			glVertex3f(-7, 7, x);
+			glEnd();
+		}
+
+	// 	// draw right face
+	// 	glVertex3f(7, -7, -7);
+	// 	glVertex3f(7, 7, -7);
+	// 	glVertex3f(7, 7, 7);
+	// 	glVertex3f(7, -7, 7);
+		for (int x = -7; x <= 7; x++) {
+			glBegin(GL_LINE_LOOP);
+			glVertex3f(7, x, -7);
+			glVertex3f(7, x, 7);
+			glEnd();
+		}
+		for (int x = -7; x <= 7; x++) {
+			glBegin(GL_LINE_LOOP);
+			glVertex3f(7, -7, x);
+			glVertex3f(7, 7, x);
+			glEnd();
+		}
+
+	// 	// draw top
+	// 	glVertex3f(7, 7, -7);
+	// 	glVertex3f(-7, 7, -7);
+	// 	glVertex3f(-7, -7, -7);
+	// 	glVertex3f(7, -7, -7);
+
+	// 	// draw bottom
+	// 	glVertex3f(7, 7, 7);
+	// 	glVertex3f(-7, 7, 7);
+	// 	glVertex3f(-7, -7, 7);
+	// 	glVertex3f(7, -7, 7);
+
+	// glEnd();
+
+}
+
+
+
+
+void par(float x1, float x2, float y1, float y2, float z1, float z2){
+	glColor3f(1.0, 1.0, 1.0);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	glBegin(GL_QUADS);
 		// draw front face
@@ -202,12 +310,12 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity ();
-
-	glTranslatef(0.0, 0.0, -22.0);
+	glTranslatef(0.0, 0.0, -40.0);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glPushMatrix();
+
 		glTranslatef(-0.3, 1.0, 0.0);
 		glRotatef(-35.0, 1.0, 0.0, 0.0);
 
@@ -223,20 +331,24 @@ void display(void)
 	par(-8.5, -8.7, -8.7,  9.2, 0.0, 0.5);
 	par( 9.2,  9.0, -8.7,  9.2, 0.0, 0.5);
 
+		drawmap();
+		glPushMatrix();
+		
+
+
 	while(p != NULL){
-		par((p -> x)/2.0,(p -> x)/2.0 + 0.4,(p -> y)/2.0,(p -> y)/2.0 + 0.4, (p -> z)/2.0,(p -> z)/2.0 + 0.4);
+		par((p -> x),(p -> x) + 1,(p -> y),(p -> y) + 1, 7, 7.0);
 		p = p -> next;	
 	}
-	par(fx/2.0, fx/2.0 + 0.4 , fy/2.0 , fy/2.0 + 0.4, fz/2.0 , fz/2.0 + 0.4);
+	par(fx, fx + 1 , fy , fy + 1, 7, 7.0);
 	glutSwapBuffers();
+	glPopMatrix();
 	glPopMatrix();
 }
 
 void myIdleFunc(int a) {
 	if(!p){
-		if(snake -> x + mx >= 18 || snake -> x + mx <= -18) start();
-		else if(snake -> y + my >= 18 || snake -> y + my <= -18) start();
-		else if(tail()) start();
+		if(tail()) start();
 		else if(sc >= 30) {
 			cout << "\n" << endl;
 			cout << "you win!" << endl;	
@@ -295,25 +407,8 @@ void keyboard(unsigned char key, int x, int y)
 				mz =  0;
 			}
 		}
-	}else if((char)key == 'q'){
-		if(!p){		
-			if(mz == -1) rev();
-			else{
-				mx =  0;
-				my =  0;
-				mz =  1;
-			}
-		}
-	}else if((char)key == 'e'){
-		if(!p){		
-			if(mz == 1) rev();
-			else{
-				mx =  0;
-				my =  0;
-				mz = -1;
-			}
-		}
-	}else if((char)key == 'p'){ //pause
+
+	}else if((char)key == 'p'){
 		if(p) p = false;
 		else p = true;	
 	}else if((char)key == 'z'){ //change color. and yes, I am that boring
