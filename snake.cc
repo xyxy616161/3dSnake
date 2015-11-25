@@ -313,11 +313,11 @@ void display(void)
 	glTranslatef(0.0, 0.0, -40.0);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glRotatef(-90, 1.0, 0.0, 0.0);
 
 	glPushMatrix();
 
-		glTranslatef(-0.3, 1.0, 0.0);
-		glRotatef(-35.0, 1.0, 0.0, 0.0);
+		
 
 	int i;
 	sq *p = snake;
@@ -326,10 +326,6 @@ void display(void)
 	} else {
 		glColor3f(1.0, 1.0, 1.0);
 	}
-	par(-8.7,  9.2,  9.0,  9.2, 0.0, 0.5);
-	par(-8.7,  9.2, -8.5, -8.7, 0.0, 0.5);
-	par(-8.5, -8.7, -8.7,  9.2, 0.0, 0.5);
-	par( 9.2,  9.0, -8.7,  9.2, 0.0, 0.5);
 
 		drawmap();
 		glPushMatrix();
