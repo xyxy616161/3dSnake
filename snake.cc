@@ -81,8 +81,8 @@ void set_f(){
 bool tail(){
 	sq *p = snake;
 	while(p -> next != NULL){
-		if(p -> next -> x == snake -> x + mx && p -> next -> y == snake -> y + my
-			&& p -> next -> z == snake -> z + mz)
+		if(p -> next -> x == snake -> x && p -> next -> y == snake -> y
+			&& p -> next -> z == snake -> z )
 			return true;	
 		p = p -> next;
 	}
