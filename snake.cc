@@ -21,7 +21,7 @@ typedef struct sq{
 	int mx;
 	int my;
 	int mz;
-	
+	int snake_face;
 	struct sq *next;
 } sq;
 
@@ -40,7 +40,7 @@ bool p = false;
 int current_face = 0; //0 for default
 
 
-void add(int x, int y, int z){
+void add(int x, int y, int z, int snake_face){
 	sq *tmp = (sq *)malloc(sizeof(sq));
 	tmp -> x = x;
 	tmp -> y = y;
@@ -48,16 +48,17 @@ void add(int x, int y, int z){
 	tmp -> mx = 1;
 	tmp -> my = 0;
 	tmp -> mz = 0;
+	tmp -> snake_face = snake_face;
 	tmp -> next = snake;
 	snake = tmp;
 }
 void start(){
 	snake = NULL;
-	add(0, 0, 7);
-	add(1, 0, 7);
-	add(2, 0, 7);
-	add(3, 0, 7);
-	add(4, 0, 7);
+	add(0, 0, 7, 0);
+	add(1, 0, 7, 0);
+	add(2, 0, 7, 0);
+	add(3, 0, 7, 0);
+	add(4, 0, 7, 0);
 	mx = 1;
 	my = 0;
 	mz = 0;
@@ -118,6 +119,7 @@ void move(){
 	int x = p -> x;
 	int y = p -> y;
 	int z = p -> z;
+	int snake_face = p -> snake_face;
 	int tmx = p -> mx;
 	int tmy = p -> my;
 	int tmz = p -> mz;
@@ -135,6 +137,10 @@ void move(){
 		tmp = q -> z;
 		q -> z = z;
 		z = tmp;
+
+		tmp = q->snake_face;
+		q -> snake_face = snake_face;
+		snake_face = tmp;
 
 		tmp = q -> mx;
 		q -> mx = tmx;
@@ -167,12 +173,16 @@ void move(){
 
 	if ( (current_face == 0) && (snake->x >= 7) ) {
 		current_face = 1;
+		snake->snake_face = 1;
+		snake->z --;
 		mx = 0;
 		my = 0;
 		mz = -1;
 	}
 	else if ( (current_face == 1) && (snake->z >= 7) ){
 		current_face = 0;
+		snake->snake_face = 0;
+		snake->x --;
 		mx = -1;
 		my = 0;
 		mz = 0;
@@ -320,11 +330,11 @@ void display(void)
 	
 
 	while(p != NULL){
-		if (current_face == 0){
-			par((p -> x),(p -> x) + 1,(p -> y),(p -> y) + 1, p -> z, p -> z );
+		if (p->snake_face == 0){
+			par((p -> x) ,(p -> x) +1,(p -> y),(p -> y) + 1, p -> z, p -> z);
 			p = p -> next;
 		}
-		else if (current_face == 1){
+		else if (p->snake_face == 1){
 			par((p -> x),(p -> x),(p -> y),(p -> y) + 1, p -> z, p -> z + 1);
 			p = p->next;
 		}
@@ -345,7 +355,7 @@ void myIdleFunc(int a) {
 			exit(0);
 		}else{
 			if(snake -> x + mx == fx && snake -> y + my == fy){
-				add(fx, fy, fz);	
+				add(fx, fy, fz, snake->snake_face);	
 				sc++;
 				set_f();
 			}
