@@ -8,7 +8,6 @@
 #include <ctime>
 #include <iostream>
 #include <stdlib.h>
-#include <stdio.h>
 #include <GL/gl.h>
 #include <GL/glut.h>
 
@@ -37,7 +36,6 @@ int fy = -6;
 int fz = 0;
 int sc = 0;
 bool p = false;
-bool color = true;
 
 
 void add(int x, int y, int z){
@@ -80,7 +78,6 @@ void set_f(){
 		}	
 	}
 }
-
 bool tail(){
 	sq *p = snake;
 	while(p -> next != NULL){
@@ -164,7 +161,6 @@ void move(){
 	}
 
 }
-
 
 
 void drawmap(){
@@ -313,24 +309,20 @@ void display(void)
 	glTranslatef(0.0, 0.0, -40.0);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glRotatef(-90, 1.0, 0.0, 0.0);
 
 	glPushMatrix();
-
-		
-
-	int i;
-	sq *p = snake;
-	if (color) {
-		glColor3f(0.5, 0.0, 100.0);	
-	} else {
-		glColor3f(1.0, 1.0, 1.0);
-	}
-
 		drawmap();
 		glPushMatrix();
 		
+		
 
+
+		
+
+	
+	int i;
+	sq *p = snake;
+	
 
 	while(p != NULL){
 		par((p -> x),(p -> x) + 1,(p -> y),(p -> y) + 1, 7, 7.0);
@@ -341,7 +333,6 @@ void display(void)
 	glPopMatrix();
 	glPopMatrix();
 }
-
 void myIdleFunc(int a) {
 	if(!p){
 		if(tail()) start();
@@ -354,7 +345,6 @@ void myIdleFunc(int a) {
 			if(snake -> x + mx == fx && snake -> y + my == fy){
 				add(fx, fy, fz);	
 				sc++;
-				glColor3f(0.0, 0.0, 0.0);
 				set_f();
 			}
 		}
@@ -403,20 +393,14 @@ void keyboard(unsigned char key, int x, int y)
 				mz =  0;
 			}
 		}
-
 	}else if((char)key == 'p'){
 		if(p) p = false;
 		else p = true;	
-	}else if((char)key == 'z'){ //change color. and yes, I am that boring
-		if (color) color = false;
-		else color = true;
 	}
-
 }
 
 void init()
 {
-	glClearColor(0.7f, 0.7f, 0.9f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
 
@@ -443,14 +427,14 @@ int main(int argc, char** argv)
 {
 
 	if(argc < 2){
-		cout << "\n usage :\n\n ./snake 800x600\n" << endl;		
+		cout << "\n usage :\n\n ./snake width height\n" << endl;		
 		return 0;
 	}
 	string s(argv[1]);
 	s += string(":16@60");
 
 	start();
-
+	set_f();
 	glutInit(&argc,argv);
 	glutInitDisplayMode ( GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutGameModeString(s.c_str());
@@ -461,10 +445,6 @@ int main(int argc, char** argv)
 	glutReshapeFunc(Reshape);
 	glutKeyboardFunc( keyboard );
 	glutDisplayFunc(display);
-	glPushMatrix();
-		glColor3f(0.0, 0.0, 0.0);
-		set_f();
-	glPopMatrix();
 	
 	
 	glutMainLoop();
