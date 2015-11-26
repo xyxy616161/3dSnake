@@ -27,6 +27,9 @@ typedef struct sq{
 
 sq *snake;
 
+int start_flag = 1;
+
+
 int mx;
 int my;
 int mz;
@@ -115,6 +118,7 @@ void rev(){
 }
 
 void move(){
+	start_flag = 0;
 	sq *p = snake;
 	int x = p -> x;
 	int y = p -> y;
@@ -170,8 +174,11 @@ void move(){
 	if (snake -> y <= -8){
 		snake -> y = 6;
 	}
+	
+	
 
 	if ( (current_face == 0) && (snake->x >= 7) ) {
+		start_flag = 0;
 		current_face = 1;
 		snake->snake_face = 1;
 		snake->z --;
@@ -180,6 +187,7 @@ void move(){
 		mz = -1;
 	}
 	else if ( (current_face == 1) && (snake->z >= 7) ) {
+		start_flag = 0;
 		current_face = 0;
 		snake->snake_face = 0;
 		snake->x --;
@@ -189,22 +197,61 @@ void move(){
 	}
 
 	else if ( (current_face == 0) && (snake->x <= -8) ) {
+		start_flag = 0;
 		current_face = 3;
 		snake->snake_face = 3;
 		snake->z --;
-		snake->x ++;
 		mx = 0;
 		my = 0;
 		mz = -1;
 	}
 	else if ( (current_face == 3) && (snake->z >= 7) ) {
+		start_flag = 0;
 		current_face = 0;
 		snake->snake_face = 0;
+		snake->x ++;
+		mx = 1;
+		my = 0;
+		mz = 0;
+	}
+	else if ( (current_face == 1) && (snake->z <= -8) ) {
+		start_flag = 0;
+		current_face = 2;
+		snake->snake_face = 2;
+		snake->x --;
+		mx = -1;
+		my = 0;
+		mz = 0;
+	}
+	else if ( (current_face == 2) && (snake->x >= 7) ) {
+		start_flag = 0;
+		current_face = 1;
+		snake->snake_face = 1;
+		snake->z ++;
+		mx = 0;
+		my = 0;
+		mz = 1;
+	}
+	else if ( (current_face == 2) && (snake->x <= -8) ) {
+		start_flag = 0;
+		current_face = 3;
+		snake->snake_face = 3;
+		snake->z ++;
+		mx = 0;
+		my = 0;
+		mz = 1;
+	}
+	else if ( (current_face == 3) && (snake->z <= -8) ) {
+		start_flag = 0;
+		current_face = 2;
+		snake->snake_face = 2;
+		snake->x ++;
 		mx = 1;
 		my = 0;
 		mz = 0;
 	}
 
+	start_flag = 1;
 }
 
 
@@ -333,6 +380,13 @@ void display(void)
 		glRotatef(-snake->y * 6.43, 0.0, 0.0, 1.0);	
 	}
 
+	else if (current_face == 2) {
+		glRotatef(180 , 0.0, 1.0, 0.0);
+		glRotatef(-snake->y * 6.43, 1.0, 0.0, 0.0);
+		glRotatef(snake->x * 6.43, 0.0, 1.0, 0.0);
+		
+	}
+
 	else if (current_face == 3) {
 		glRotatef(90 , 0.0, 1.0, 0.0);
 		glRotatef(-snake->z * 6.43, 0.0, 1.0, 0.0);
@@ -361,8 +415,12 @@ void display(void)
 			par((p -> x),(p -> x),(p -> y),(p -> y) + 1, p -> z, p -> z + 1);
 			p = p->next;
 		}
+		else if (p->snake_face == 2){
+			par((p -> x),(p -> x) + 1,(p -> y),(p -> y) + 1, p -> z + 1, p -> z + 1);
+			p = p->next;
+		}
 		else if (p->snake_face == 3) {
-			par((p -> x),(p -> x),(p -> y),(p -> y) + 1, p -> z, p -> z + 1);
+			par((p -> x) + 1,(p -> x) + 1,(p -> y),(p -> y) + 1, p -> z, p -> z + 1);
 			p = p->next;
 		}
 			
@@ -409,6 +467,11 @@ void keyboard(unsigned char key, int x, int y)
 				my = 0;
 				mz = 1;
 			}
+			else if ((current_face == 2) && (mx != 1)) {
+				mx = 1;
+				my = 0;
+				mz = 0;
+			}
 			else if ((current_face == 3) && (mz != 1)) {
 				mx = 0;
 				my = 0;
@@ -428,6 +491,11 @@ void keyboard(unsigned char key, int x, int y)
 				my = 0;
 				mz = -1;
 			}
+			else if ((current_face == 2) && (mx != -1)) {
+				mx = -1;
+				my = 0;
+				mz = 0;
+			}
 			else if ((current_face == 3) && (mz != -1)) {
 				mx = 0;
 				my = 0;
@@ -444,6 +512,11 @@ void keyboard(unsigned char key, int x, int y)
 				mz =  0;
 			}
 			else if ((current_face == 1) && (my != -1)) {
+				mx = 0;
+				my = 1;
+				mz = 0;
+			}
+			else if ((current_face == 2) && (my != -1)) {
 				mx = 0;
 				my = 1;
 				mz = 0;
@@ -468,6 +541,11 @@ void keyboard(unsigned char key, int x, int y)
 				my = -1;
 				mz = 0;
 			}
+			else if ( (current_face == 2) && (my != 1) ) {
+				mx = 0;
+				my = -1;
+				mz = 0;
+			}
 			else if ( (current_face == 3) && (my != 1) ) {
 				mx = 0;
 				my = -1;
@@ -478,6 +556,8 @@ void keyboard(unsigned char key, int x, int y)
 	}else if((char)key == 'p'){
 		if(p) p = false;
 		else p = true;	
+	}else if((char)key == 'r'){
+		if (start_flag == 1) start();	
 	}
 }
 
