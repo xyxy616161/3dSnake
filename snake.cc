@@ -27,7 +27,6 @@ typedef struct sq{
 
 sq *snake;
 
-int start_flag = 1;
 
 
 int mx;
@@ -44,35 +43,67 @@ int current_face = 0; //0 for default
 
 
 void add(int x, int y, int z, int snake_face){
-	sq *tmp = (sq *)malloc(sizeof(sq));
-	tmp -> x = x;
-	tmp -> y = y;
-	tmp -> z = z;
-	tmp -> mx = 1;
-	tmp -> my = 0;
-	tmp -> mz = 0;
-	tmp -> snake_face = snake_face;
-	tmp -> next = snake;
-	snake = tmp;
+	if (snake != NULL) {
+		sq *tmp = (sq *)malloc(sizeof(sq));
+		tmp -> x = x;
+		tmp -> y = y;
+		tmp -> z = z;
+		tmp -> mx = snake->mx;
+		tmp -> my = snake->my;
+		tmp -> mz = snake->mz;
+		tmp -> snake_face = snake_face;
+		tmp -> next = snake;
+		snake = tmp;
+	} else {
+		sq *tmp = (sq *)malloc(sizeof(sq));
+		tmp -> x = x;
+		tmp -> y = y;
+		tmp -> z = z;
+		tmp -> mx = 1;
+		tmp -> my = 0;
+		tmp -> mz = 0;
+		tmp -> snake_face = snake_face;
+		tmp -> next = snake;
+		snake = tmp;
+	}
 }
 void start(){
-	snake = NULL;
-	add(0, 0, 7, 0);
-	add(1, 0, 7, 0);
-	add(2, 0, 7, 0);
-	add(3, 0, 7, 0);
-	add(4, 0, 7, 0);
-	mx = 1;
-	my = 0;
-	mz = 0;
+	// if (snake != NULL){
+	// 	if ((current_face == snake->snake_face) && (abs(snake->x) < 7) && (abs(snake->z) < 7)) {
+			free(snake);
+			sc = 0;
+			snake = NULL;
+			add(0, 0, 7, 0);
+			add(1, 0, 7, 0);
+			add(2, 0, 7, 0);
+			add(3, 0, 7, 0);
+			add(4, 0, 7, 0);
+			mx = 1;
+			my = 0;
+			mz = 0;
+			snake->snake_face = 0;
+			current_face = 0;
+	// 	}
+	// }
+	// else{
+	// 	snake = NULL;
+	// 		add(0, 0, 7, 0);
+	// 		add(1, 0, 7, 0);
+	// 		add(2, 0, 7, 0);
+	// 		add(3, 0, 7, 0);
+	// 		add(4, 0, 7, 0);
+	// 		mx = 1;
+	// 		my = 0;
+	// 		mz = 0;
+	// }
 }
 void set_f(){
 	bool f = true;
 	while(f){
 		srand(time(NULL));
-		fx = (rand() % 14) - 7;	 
+		fx = (rand() % 12) - 6;	 
 		srand(time(NULL));
-		fy = (rand() % 14) - 7;
+		fy = (rand() % 12) - 6;
 		sq *p = snake;
 		while(p != NULL){
 			if(p -> x == fx && p -> y == fy && p -> z == fz){
@@ -118,7 +149,6 @@ void rev(){
 }
 
 void move(){
-	start_flag = 0;
 	sq *p = snake;
 	int x = p -> x;
 	int y = p -> y;
@@ -178,7 +208,7 @@ void move(){
 	
 
 	if ( (current_face == 0) && (snake->x >= 7) ) {
-		start_flag = 0;
+
 		current_face = 1;
 		snake->snake_face = 1;
 		snake->z --;
@@ -187,7 +217,7 @@ void move(){
 		mz = -1;
 	}
 	else if ( (current_face == 1) && (snake->z >= 7) ) {
-		start_flag = 0;
+
 		current_face = 0;
 		snake->snake_face = 0;
 		snake->x --;
@@ -197,7 +227,7 @@ void move(){
 	}
 
 	else if ( (current_face == 0) && (snake->x <= -8) ) {
-		start_flag = 0;
+
 		current_face = 3;
 		snake->snake_face = 3;
 		snake->z --;
@@ -206,7 +236,7 @@ void move(){
 		mz = -1;
 	}
 	else if ( (current_face == 3) && (snake->z >= 7) ) {
-		start_flag = 0;
+
 		current_face = 0;
 		snake->snake_face = 0;
 		snake->x ++;
@@ -215,7 +245,7 @@ void move(){
 		mz = 0;
 	}
 	else if ( (current_face == 1) && (snake->z <= -8) ) {
-		start_flag = 0;
+
 		current_face = 2;
 		snake->snake_face = 2;
 		snake->x --;
@@ -224,7 +254,7 @@ void move(){
 		mz = 0;
 	}
 	else if ( (current_face == 2) && (snake->x >= 7) ) {
-		start_flag = 0;
+
 		current_face = 1;
 		snake->snake_face = 1;
 		snake->z ++;
@@ -233,7 +263,7 @@ void move(){
 		mz = 1;
 	}
 	else if ( (current_face == 2) && (snake->x <= -8) ) {
-		start_flag = 0;
+
 		current_face = 3;
 		snake->snake_face = 3;
 		snake->z ++;
@@ -242,7 +272,7 @@ void move(){
 		mz = 1;
 	}
 	else if ( (current_face == 3) && (snake->z <= -8) ) {
-		start_flag = 0;
+
 		current_face = 2;
 		snake->snake_face = 2;
 		snake->x ++;
@@ -251,7 +281,7 @@ void move(){
 		mz = 0;
 	}
 
-	start_flag = 1;
+
 }
 
 
@@ -406,6 +436,7 @@ void display(void)
 	sq *p = snake;
 	
 
+
 	while(p != NULL){
 		if (p->snake_face == 0){
 			par((p -> x) ,(p -> x) +1,(p -> y),(p -> y) + 1, p -> z, p -> z);
@@ -429,17 +460,20 @@ void display(void)
 	glutSwapBuffers();
 	glPopMatrix();
 	glPopMatrix();
+
 }
 void myIdleFunc(int a) {
 	if(!p){
-		if(tail()) start();
-		else if(sc >= 30) {
+		if(tail()) {
+			start();
+		}
+		else if(sc >= 2300) {
 			cout << "\n" << endl;
 			cout << "you win!" << endl;	
 			cout << "\n" << endl;
 			exit(0);
 		}else{
-			if(snake -> x + mx == fx && snake -> y + my == fy){
+			if(snake -> x + mx == fx && snake -> y + my == fy && snake -> z + mz == fz){
 				add(fx, fy, fz, snake->snake_face);	
 				sc++;
 				set_f();
@@ -448,7 +482,32 @@ void myIdleFunc(int a) {
 		move();
 		glutPostRedisplay();
 	}
-	glutTimerFunc(100, myIdleFunc, 0);
+	glutTimerFunc(150, myIdleFunc, 0);
+}
+
+void init()
+{
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_COLOR_MATERIAL);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_NORMALIZE);
+	glShadeModel(GL_SMOOTH);	
+	glLoadIdentity ();
+	glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+
+	GLfloat acolor[] = {1.4, 1.4, 1.4, 1.0};
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, acolor);
+
+}
+void Reshape(int w, int h)
+{
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_PROJECTION); 
+	glLoadIdentity();
+	gluPerspective(45.0, (float)w/(float)h, 0.1, 200.0);
+	
 }
 void keyboard(unsigned char key, int x, int y)
 {
@@ -557,34 +616,14 @@ void keyboard(unsigned char key, int x, int y)
 		if(p) p = false;
 		else p = true;	
 	}else if((char)key == 'r'){
-		if (start_flag == 1) start();	
+		if( (-7 < snake->x <= 8) && (-7 < snake->z <= 8) ){
+			start();
+		}	
 	}
 }
 
-void init()
-{
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_COLOR_MATERIAL);
 
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_NORMALIZE);
-	glShadeModel(GL_SMOOTH);	
-	glLoadIdentity ();
-	glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
 
-	GLfloat acolor[] = {1.4, 1.4, 1.4, 1.0};
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, acolor);
-
-}
-void Reshape(int w, int h)
-{
-    	glViewport(0, 0, w, h);
-    	glMatrixMode(GL_PROJECTION); 
-		glLoadIdentity();
-		gluPerspective(45.0, (float)w/(float)h, 0.1, 200.0);
-	
-}
 int main(int argc, char** argv)
 {
 
@@ -595,8 +634,8 @@ int main(int argc, char** argv)
 	string s(argv[1]);
 	s += string(":16@60");
 
-	start();
-	set_f();
+	// start();
+	// set_f();
 	glutInit(&argc,argv);
 	glutInitDisplayMode ( GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutGameModeString(s.c_str());
@@ -607,7 +646,8 @@ int main(int argc, char** argv)
 	glutReshapeFunc(Reshape);
 	glutKeyboardFunc( keyboard );
 	glutDisplayFunc(display);
-	
+	start();
+	set_f();
 	
 	glutMainLoop();
 	return 0;
