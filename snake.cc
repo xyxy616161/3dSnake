@@ -36,6 +36,7 @@ int mz;
 int fx = -6;
 int fy = -6;
 int fz = 7;
+int fface = 0;
 int sc = 0;
 bool p = false;
 
@@ -83,27 +84,41 @@ void start(){
 			mz = 0;
 			snake->snake_face = 0;
 			current_face = 0;
-	// 	}
-	// }
-	// else{
-	// 	snake = NULL;
-	// 		add(0, 0, 7, 0);
-	// 		add(1, 0, 7, 0);
-	// 		add(2, 0, 7, 0);
-	// 		add(3, 0, 7, 0);
-	// 		add(4, 0, 7, 0);
-	// 		mx = 1;
-	// 		my = 0;
-	// 		mz = 0;
-	// }
 }
 void set_f(){
 	bool f = true;
 	while(f){
 		srand(time(NULL));
-		fx = (rand() % 12) - 6;	 
-		srand(time(NULL));
-		fy = (rand() % 12) - 6;
+		fface = (rand() % 4);
+		if (fface == 0) {
+			srand(time(NULL));
+			fx = (rand() % 12) - 6;	 
+			srand(time(NULL));
+			fy = (rand() % 12) - 6;
+			fz = 7;
+		}
+		else if (fface == 1) {
+			srand(time(NULL));
+			fz = (rand() % 12) - 6;	 
+			srand(time(NULL));
+			fy = (rand() % 12) - 6;
+			fx = 7;
+		}
+		else if (fface == 2) {
+			srand(time(NULL));
+			fx = (rand() % 12) - 6;	 
+			srand(time(NULL));
+			fy = (rand() % 12) - 6;
+			fz = -7;
+		}
+		else if (fface == 3) {
+			srand(time(NULL));
+			fz = (rand() % 12) - 6;	 
+			srand(time(NULL));
+			fy = (rand() % 12) - 6;
+			fx = -7;
+		}
+		
 		sq *p = snake;
 		while(p != NULL){
 			if(p -> x == fx && p -> y == fy && p -> z == fz){
@@ -343,6 +358,63 @@ void drawmap(){
 
 }
 
+void foodpar(float x1, float x2, float y1, float y2, float z1, float z2){
+	glColor3f(0.0, 1.0, 0.0);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	if (fface == 0) {
+		z2 ++;
+	}
+	else if (fface == 1){
+		x2 ++;
+	}
+	else if (fface == 2){
+		z2 --;
+	}
+	else if (fface == 3){
+		x2 --;
+	}
+
+	glBegin(GL_QUADS);
+		// draw front face
+		glVertex3f(x1, y2, z2);
+		glVertex3f(x2, y2, z2);
+		glVertex3f(x2, y2, z1);
+		glVertex3f(x1, y2, z1);
+
+		// draw back face
+		glVertex3f(x1, y1, z2);
+		glVertex3f(x2, y1, z2);
+		glVertex3f(x2, y1, z1);
+		glVertex3f(x1, y1, z1);
+
+		// draw left face
+		glVertex3f(x2, y2, z2);
+		glVertex3f(x2, y1, z2);
+		glVertex3f(x2, y1, z1);
+		glVertex3f(x2, y2, z1);
+
+		// draw right face
+		glVertex3f(x1, y2, z2);
+		glVertex3f(x1, y1, z2);
+		glVertex3f(x1, y1, z1);
+		glVertex3f(x1, y2, z1);
+
+		// draw top
+		glVertex3f(x1, y1, z2);
+		glVertex3f(x2, y1, z2);
+		glVertex3f(x2, y2, z2);
+		glVertex3f(x1, y2, z2);
+
+		// draw bottom
+		glVertex3f(x1, y1, z1);
+		glVertex3f(x2, y1, z1);
+		glVertex3f(x2, y2, z1);
+		glVertex3f(x1, y2, z1);
+
+	glEnd();
+	
+}
+
 
 
 
@@ -456,7 +528,26 @@ void display(void)
 		}
 			
 	}
-	par(fx, fx + 1 , fy , fy + 1, fz, fz);
+	if ( (fface == 0) || (fface == 2) ) {
+		// glPushMatrix();
+			// glRotatef(45, 0.0, 1.0, 0.0);
+			foodpar(fx, fx + 1 , fy , fy + 1, fz, fz);
+
+		// glPopMatrix();
+		cout << "fx: " << endl;	
+		cout << fx << endl;
+		cout << "\n" << endl;
+		cout << "fy: " << endl;
+		cout << fy << endl;
+		cout << "\n" << endl;
+		cout << "fz: " << endl;
+		cout << fz << endl;
+		// foodpar(fx, fx + 1 , fy , fy + 1, fz, fz);
+	}
+	else if ((fface == 1)||(fface == 3)) {
+		foodpar(fx, fx, fy , fy + 1, fz, fz + 1);
+	}
+	
 	glutSwapBuffers();
 	glPopMatrix();
 	glPopMatrix();
@@ -473,8 +564,23 @@ void myIdleFunc(int a) {
 			cout << "\n" << endl;
 			exit(0);
 		}else{
-			if(snake -> x + mx == fx && snake -> y + my == fy && snake -> z + mz == fz){
+			if ( (fface == 0) && (snake -> x + mx == fx && snake -> y + my == fy && snake -> z + mz == fz) ) {
+				add(fx, fy, fz , snake->snake_face);	
+				sc++;
+				set_f();
+			}
+			else if ( (fface == 1) && (snake -> x + mx == fx && snake -> y + my == fy && snake -> z + mz  == fz) ) {
 				add(fx, fy, fz, snake->snake_face);	
+				sc++;
+				set_f();
+			}
+			else if ( (fface == 2) && (snake -> x + mx == fx && snake -> y + my == fy && snake -> z + mz + 1 == fz) ) {
+				add(fx, fy, fz - 1, snake->snake_face);	
+				sc++;
+				set_f();
+			}	
+			else if ( (fface == 3) && (snake -> x + mx + 1 == fx && snake -> y + my == fy && snake -> z + mz == fz) ) {
+				add(fx - 1, fy, fz, snake->snake_face);	
 				sc++;
 				set_f();
 			}
@@ -482,7 +588,7 @@ void myIdleFunc(int a) {
 		move();
 		glutPostRedisplay();
 	}
-	glutTimerFunc(150, myIdleFunc, 0);
+	glutTimerFunc(100, myIdleFunc, 0);
 }
 
 void init()
