@@ -10,6 +10,10 @@
 #include <stdlib.h>
 #include <GL/gl.h>
 #include <GL/glut.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sstream>
 
 
 using namespace std;
@@ -38,8 +42,11 @@ int fy = -6;
 int fz = 7;
 int fface = 0;
 int sc = 0;
+float level = 1.0;
+int level_str = 1.0;
 bool p = false;
-
+void *font1 = GLUT_BITMAP_TIMES_ROMAN_24;
+void *font2 = GLUT_BITMAP_HELVETICA_18;
 int current_face = 0; //0 for default
 
 
@@ -69,21 +76,19 @@ void add(int x, int y, int z, int snake_face){
 	}
 }
 void start(){
-	// if (snake != NULL){
-	// 	if ((current_face == snake->snake_face) && (abs(snake->x) < 7) && (abs(snake->z) < 7)) {
-			free(snake);
-			sc = 0;
-			snake = NULL;
-			add(0, 0, 7, 0);
-			add(1, 0, 7, 0);
-			add(2, 0, 7, 0);
-			add(3, 0, 7, 0);
-			add(4, 0, 7, 0);
-			mx = 1;
-			my = 0;
-			mz = 0;
-			snake->snake_face = 0;
-			current_face = 0;
+	free(snake);
+	sc = 0;
+	snake = NULL;
+	add(0, 0, 7, 0);
+	add(1, 0, 7, 0);
+	add(2, 0, 7, 0);
+	add(3, 0, 7, 0);
+	add(4, 0, 7, 0);
+	mx = 1;
+	my = 0;
+	mz = 0;
+	snake->snake_face = 0;
+		current_face = 0;
 }
 void set_f(){
 	bool f = true;
@@ -118,10 +123,10 @@ void set_f(){
 			fy = (rand() % 12) - 6;
 			fx = -7;
 		}
-		
 		sq *p = snake;
 		while(p != NULL){
-			if(p -> x == fx && p -> y == fy && p -> z == fz){
+			if( (p -> x == fx || p -> x == -fx) && (p -> y == fy || p -> y == -fy) 
+				&& (p -> z == fz || p -> z == -fz) ){
 				f = true;
 				break;		
 			}	
@@ -139,28 +144,6 @@ bool tail(){
 		p = p -> next;
 	}
 	return false;
-}
-void rev(){
-	sq *snake2 = NULL;
-	sq *p = snake;
-	while(p != NULL){
-		sq *tmp = (sq *)malloc(sizeof(sq));
-		tmp -> x = p -> x;
-		tmp -> y = p -> y;
-		tmp -> z = p -> z;
-		tmp -> mx = -1 * p -> mx;
-		tmp -> my = -1 * p -> my;
-		tmp -> mz = -1 * p -> mz;
-		tmp -> next = snake2;
-		snake2 = tmp;
-		sq *x = p -> next;
-		free(p);
-		p = x;	
-	}
-	snake = snake2;
-	mx = snake -> mx;
-	my = snake -> my;
-	mz = snake -> mz;
 }
 
 void move(){
@@ -463,13 +446,49 @@ void par(float x1, float x2, float y1, float y2, float z1, float z2){
 	
 }
 
+void set_msg(float x, float y, void *font, char *string)
+{
+	glColor3f(1.0, 1.0, 1.0);
+	glRasterPos2f(x, y);
+	int len, i;
+	len = (int)strlen(string);
+	for (i = 0; i < len; i++) {
+		glutBitmapCharacter(font, string[i]);
+	}
+}
+
+void display_msg(){
+	stringstream strs1;
+	stringstream strs2;
+	strs1 << sc;
+	strs2 << level_str;
+	string temp_sc = strs1.str();
+	string temp_level = strs2.str();
+	string sc_str = "Score : ";
+	string Level = "Level : ";
+	sc_str.append(temp_sc);
+	Level.append(temp_level);
+	char* char_sc = (char *) sc_str.c_str();
+	char* char_level = (char *) Level.c_str();
+	set_msg(15.0, 13.0, font1, (char *) char_sc);
+	set_msg(15.0, 11.0, font1, (char *) char_level);
+	set_msg(-20.0, 13.0, font1, (char *)"w - UP");
+	set_msg(-20.0, 11.0, font1, (char *)"s - DOWN");
+	set_msg(-20.0, 9.0, font1, (char *)"a - LEFT");
+	set_msg(-20.0, 7.0, font1, (char *)"d - RIGHT");
+	set_msg(-20.0, 5.0, font1, (char *)"r - RESTART");
+	set_msg(-20.0, 3.0, font1, (char *)"esc - ESC");
+	set_msg(-21.0, -13.0, font2, (char *)"When your score reaches 99, you will receive the ANSWER to the ultimate ");
+	set_msg(-21.0, -14.5, font2, (char *)"question of life, the universe, and everything!!!!!");
+}
+
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity ();
 	glTranslatef(0.0, 0.0, -40.0);
-
+	display_msg();
 	//rotate around Y axis
 	if (current_face == 0) {
 		glRotatef(snake->y * 6.43, 1.0, 0.0, 0.0);
@@ -502,68 +521,72 @@ void display(void)
 	glPushMatrix();
 		drawmap();
 		glPushMatrix();
-		
-
-	int i;
-	sq *p = snake;
-	
-
-
-	while(p != NULL){
-		if (p->snake_face == 0){
-			par((p -> x) ,(p -> x) +1,(p -> y),(p -> y) + 1, p -> z, p -> z);
-			p = p -> next;
-		}
-		else if (p->snake_face == 1){
-			par((p -> x),(p -> x),(p -> y),(p -> y) + 1, p -> z, p -> z + 1);
-			p = p->next;
-		}
-		else if (p->snake_face == 2){
-			par((p -> x),(p -> x) + 1,(p -> y),(p -> y) + 1, p -> z + 1, p -> z + 1);
-			p = p->next;
-		}
-		else if (p->snake_face == 3) {
-			par((p -> x) + 1,(p -> x) + 1,(p -> y),(p -> y) + 1, p -> z, p -> z + 1);
-			p = p->next;
-		}
-			
-	}
-	if ( (fface == 0) || (fface == 2) ) {
-		// glPushMatrix();
-			// glRotatef(45, 0.0, 1.0, 0.0);
-			foodpar(fx, fx + 1 , fy , fy + 1, fz, fz);
-
-		// glPopMatrix();
-		cout << "fx: " << endl;	
-		cout << fx << endl;
-		cout << "\n" << endl;
-		cout << "fy: " << endl;
-		cout << fy << endl;
-		cout << "\n" << endl;
-		cout << "fz: " << endl;
-		cout << fz << endl;
-		// foodpar(fx, fx + 1 , fy , fy + 1, fz, fz);
-	}
-	else if ((fface == 1)||(fface == 3)) {
-		foodpar(fx, fx, fy , fy + 1, fz, fz + 1);
-	}
-	
-	glutSwapBuffers();
-	glPopMatrix();
+			int i;
+			sq *p = snake;
+			while(p != NULL){
+				if (p->snake_face == 0){
+					par((p -> x) ,(p -> x) +1,(p -> y),(p -> y) + 1, p -> z, p -> z);
+					p = p -> next;
+				}
+				else if (p->snake_face == 1){
+					par((p -> x),(p -> x),(p -> y),(p -> y) + 1, p -> z, p -> z + 1);
+					p = p->next;
+				}
+				else if (p->snake_face == 2){
+					par((p -> x),(p -> x) + 1,(p -> y),(p -> y) + 1, p -> z + 1, p -> z + 1);
+					p = p->next;
+				}
+				else if (p->snake_face == 3) {
+					par((p -> x) + 1,(p -> x) + 1,(p -> y),(p -> y) + 1, p -> z, p -> z + 1);
+					p = p->next;
+				}				
+			}
+			if ( (fface == 0) || (fface == 2) ) {
+				foodpar(fx, fx + 1 , fy , fy + 1, fz, fz);
+			}
+			else if ((fface == 1)||(fface == 3)) {
+				foodpar(fx, fx, fy , fy + 1, fz, fz + 1);
+			}
+			glutSwapBuffers();
+		glPopMatrix();
 	glPopMatrix();
 
 }
+void set_level(int score) {
+	if (sc > 5){
+		level = 1.5;
+		level_str = 2;
+	} 
+	if (sc > 10) {
+		level = 2.0;
+		level_str = 3;
+	}
+	if (sc > 15) {
+		level = 2.5;
+		level_str = 4;
+	}
+	if (sc > 20) {
+		level = 3.0;
+		level_str = 5;
+	}
+
+}
+
+
 void myIdleFunc(int a) {
 	if(!p){
 		if(tail()) {
-			start();
-		}
-		else if(sc >= 2300) {
+			// start();
+			cout << "\nGame Over!!!! \n" << endl;
+			exit(0);
+
+		} else if(sc >= 2300) {
 			cout << "\n" << endl;
 			cout << "you win!" << endl;	
 			cout << "\n" << endl;
 			exit(0);
-		}else{
+		} else{
+
 			if ( (fface == 0) && (snake -> x + mx == fx && snake -> y + my == fy && snake -> z + mz == fz) ) {
 				add(fx, fy, fz , snake->snake_face);	
 				sc++;
@@ -583,12 +606,13 @@ void myIdleFunc(int a) {
 				add(fx - 1, fy, fz, snake->snake_face);	
 				sc++;
 				set_f();
-			}
+			} 
+			set_level(sc);
 		}
 		move();
 		glutPostRedisplay();
 	}
-	glutTimerFunc(100, myIdleFunc, 0);
+	glutTimerFunc(100 / level, myIdleFunc, 0);
 }
 
 void init()
@@ -596,7 +620,7 @@ void init()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
 
-	glEnable(GL_LIGHTING);
+	// glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_NORMALIZE);
 	glShadeModel(GL_SMOOTH);	
@@ -740,12 +764,10 @@ int main(int argc, char** argv)
 	string s(argv[1]);
 	s += string(":16@60");
 
-	// start();
-	// set_f();
 	glutInit(&argc,argv);
 	glutInitDisplayMode ( GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutGameModeString(s.c_str());
-	
+
 	glutEnterGameMode();
 	init();
 	glutTimerFunc(400, myIdleFunc, 0);
@@ -754,6 +776,7 @@ int main(int argc, char** argv)
 	glutDisplayFunc(display);
 	start();
 	set_f();
+	
 	
 	glutMainLoop();
 	return 0;
