@@ -656,7 +656,7 @@ void keyboard(unsigned char key, int x, int y)
 				my = 0;
 				mz = 1;
 			}
-			else if ((current_face == 2) && (mx != 1)) {
+			else if ((current_face == 2) && (mx != -1)) {
 				mx = 1;
 				my = 0;
 				mz = 0;
@@ -680,7 +680,7 @@ void keyboard(unsigned char key, int x, int y)
 				my = 0;
 				mz = -1;
 			}
-			else if ((current_face == 2) && (mx != -1)) {
+			else if ((current_face == 2) && (mx != 1)) {
 				mx = -1;
 				my = 0;
 				mz = 0;
