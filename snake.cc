@@ -583,7 +583,12 @@ void myIdleFunc(int a) {
 	if(!p){
 		if(tail()) {
 			// start();
-			cout << "\nGame Over!!!! \n" << endl;
+			cout << "\nGame Over!!!!" << endl;
+			cout << "Your final Score is ";
+			cout << sc << endl;
+			cout << "You survived ";
+			cout << level_str;
+			cout << " Round\n" << endl;
 			exit(0);
 
 		} else if(sc >= 2300) {
