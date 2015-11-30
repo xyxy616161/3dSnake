@@ -1,0 +1,19 @@
+CSC418	3D SNAKE GAME
+How to run the game?
+The game currently can only be run on Linux (CDF) by “./snake 800x600”
+
+How do you define your map in this 3D SNAKE GAME?
+In our 3D Snake game, the map is four surfaces of a 3D cube. We define the surface where the snake initially is located “face0”, and the right face of it “face1”, opposite of it “face2”, left of it “face3”. Each surface is a 14x14 rectangle. The 3D cube is rotating when you control your snake, and the rotation depends on the location of snake’s head. For example, the snake’s head is on “face0” at x = -1 & y = 0, and then 3D cube is rotating -6.43 around  y-axis. If y = 1, the cube would be rotated 6.43 around x-axis. This rotation is to assure the snake’s head is always at the center of the screen.
+
+How do you define your snake in this 3D SNAKE GAME?
+The snake in our program is basically a linked list. Each element in the linked list has x-y-z values indicating the location of this part of the snake, and mx-my-mz values indicating the direction of this part of the snake is heading to, and the snake_face value indicating which face of the map this part of the snake is located, and a pointer to next snake part.
+
+How do you set snake’s food in this 3D SNAKE GAME?
+The food is set randomly on face0-3, and randomly on the face. After that, the program will check if the food will be set on the snake. If it does, the food would be set again.
+
+How do you control your snake?
+The snake can go four directions – “up, down, left and right”. Snake cannot move in reverse direction. For example, if the snake is now moving right, you cannot make it go left immediately. After user pressing one of the “asdw”, the snake will change its direction corresponding to the key user input by changing mx-my-mz.
+
+What happened after the snake got the food?
+If the snake got the food, the food will suddenly become a part of the snake, and next food will be generated immediately.
+
