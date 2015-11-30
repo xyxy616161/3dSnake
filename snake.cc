@@ -92,39 +92,45 @@ void start(){
 }
 void set_f(){
 	bool f = true;
+	srand(time(NULL));
 	while(f){
-		srand(time(NULL));
+		
 		fface = (rand() % 4);
 		if (fface == 0) {
-			srand(time(NULL));
+			
 			fx = (rand() % 12) - 6;	 
-			srand(time(NULL));
+			
 			fy = (rand() % 12) - 6;
 			fz = 7;
 		}
 		else if (fface == 1) {
-			srand(time(NULL));
+			
 			fz = (rand() % 12) - 6;	 
-			srand(time(NULL));
+			
 			fy = (rand() % 12) - 6;
 			fx = 7;
 		}
 		else if (fface == 2) {
-			srand(time(NULL));
+			
 			fx = (rand() % 12) - 6;	 
-			srand(time(NULL));
+			
 			fy = (rand() % 12) - 6;
 			fz = -7;
 		}
 		else if (fface == 3) {
-			srand(time(NULL));
+			
 			fz = (rand() % 12) - 6;	 
-			srand(time(NULL));
+			
 			fy = (rand() % 12) - 6;
 			fx = -7;
 		}
 		sq *p = snake;
+		
 		while(p != NULL){
+			if (snake->x + mx == fx || snake->y + my == fy || snake->z + mz ==fz){
+				f = true;
+				break;
+			}
 			if( (p -> x == fx || p -> x == -fx) && (p -> y == fy || p -> y == -fy) 
 				&& (p -> z == fz || p -> z == -fz) ){
 				f = true;
@@ -478,8 +484,8 @@ void display_msg(){
 	set_msg(-20.0, 7.0, font1, (char *)"d - RIGHT");
 	set_msg(-20.0, 5.0, font1, (char *)"r - RESTART");
 	set_msg(-20.0, 3.0, font1, (char *)"esc - ESC");
-	set_msg(-21.0, -13.0, font2, (char *)"When your score reaches 99, you will receive the ANSWER to the ultimate ");
-	set_msg(-21.0, -14.5, font2, (char *)"question of life, the universe, and everything!!!!!");
+	// set_msg(-21.0, -13.0, font2, (char *)"When your score reaches 99, you will receive the ANSWER to the ultimate ");
+	// set_msg(-21.0, -14.5, font2, (char *)"question of life, the universe, and everything!!!!!");
 }
 
 void display(void)
@@ -585,7 +591,7 @@ void myIdleFunc(int a) {
 			cout << "you win!" << endl;	
 			cout << "\n" << endl;
 			exit(0);
-		} else{
+		} else{ 
 
 			if ( (fface == 0) && (snake -> x + mx == fx && snake -> y + my == fy && snake -> z + mz == fz) ) {
 				add(fx, fy, fz , snake->snake_face);	
@@ -612,7 +618,7 @@ void myIdleFunc(int a) {
 		move();
 		glutPostRedisplay();
 	}
-	glutTimerFunc(100 / level, myIdleFunc, 0);
+	glutTimerFunc(100/level, myIdleFunc, 0);
 }
 
 void init()
