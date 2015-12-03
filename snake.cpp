@@ -53,7 +53,7 @@ void *font1 = GLUT_BITMAP_TIMES_ROMAN_24;
 void *font2 = GLUT_BITMAP_HELVETICA_18;
 void light();
 void drawCube(float x1, float x2, float y1, float y2, float z1, float z2);
-
+void drawRectangle(float width, float length);
 
 void drawCube(float x1, float x2, float y1, float y2, float z1, float z2){
 	glBegin(GL_QUADS);
@@ -91,6 +91,17 @@ void drawCube(float x1, float x2, float y1, float y2, float z1, float z2){
 	glEnd();
 }
 
+void drawRectangle(float width, float length) {
+	glBegin(GL_POLYGON);
+		glColor3f(1.0, 1.0, 1.0);
+		glNormal3f(0.0, 1.0, 0.0);
+		glVertex3f(-width/2, -length/2, 0.0);
+		glVertex3f( width/2, -length/2, 0.0);
+		glVertex3f( width/2,  length/2, 0.0);
+		glVertex3f(-width/2,  length/2, 0.0);
+	glEnd();
+}
+
 void add(int x, int y, int z, int snake_face){
 	sq *tmp = (sq *)malloc(sizeof(sq));
 	tmp -> x = x;
@@ -123,7 +134,7 @@ void start(){
 	my = 0;
 	mz = 0;
 	snake->snake_face = 0;
-		current_face = 0;
+	current_face = 0;
 }
 
 void set_f(){
@@ -301,55 +312,55 @@ void move(){
 }
 
 void drawmap(){
-		glColor3f(0.5, 0.0, 100.0);
-		for (int x = -7; x <= 7; x++) {
-			glBegin(GL_LINE_LOOP);
+	glColor3f(0.5, 0.0, 100.0);
+	for (int x = -7; x <= 7; x++) {
+		glBegin(GL_LINE_LOOP);
 			glVertex3f(x, -7, -7);
 			glVertex3f(x, 7, -7);
-			glEnd();
-		}
-		for (int x = -7; x <= 7; x++) {
-			glBegin(GL_LINE_LOOP);
+		glEnd();
+	}
+	for (int x = -7; x <= 7; x++) {
+		glBegin(GL_LINE_LOOP);
 			glVertex3f(-7, x, -7);
 			glVertex3f(7, x, -7);
-			glEnd();
-		}
-		for (int x = -7; x <= 7; x++) {
-			glBegin(GL_LINE_LOOP);
+		glEnd();
+	}
+	for (int x = -7; x <= 7; x++) {
+		glBegin(GL_LINE_LOOP);
 			glVertex3f(x, -7, 7);
 			glVertex3f(x, 7, 7);
-			glEnd();
-		}
-		for (int x = -7; x <= 7; x++) {
-			glBegin(GL_LINE_LOOP);
+		glEnd();
+	}
+	for (int x = -7; x <= 7; x++) {
+		glBegin(GL_LINE_LOOP);
 			glVertex3f(-7, x, 7);
 			glVertex3f(7, x, 7);
-			glEnd();
-		}
-		for (int x = -7; x <= 7; x++) {
-			glBegin(GL_LINE_LOOP);
+		glEnd();
+	}
+	for (int x = -7; x <= 7; x++) {
+		glBegin(GL_LINE_LOOP);
 			glVertex3f(-7, x, -7);
 			glVertex3f(-7, x, 7);
-			glEnd();
-		}
-		for (int x = -7; x <= 7; x++) {
-			glBegin(GL_LINE_LOOP);
+		glEnd();
+	}
+	for (int x = -7; x <= 7; x++) {
+		glBegin(GL_LINE_LOOP);
 			glVertex3f(-7, -7, x);
 			glVertex3f(-7, 7, x);
-			glEnd();
-		}
-		for (int x = -7; x <= 7; x++) {
-			glBegin(GL_LINE_LOOP);
+		glEnd();
+	}
+	for (int x = -7; x <= 7; x++) {
+		glBegin(GL_LINE_LOOP);
 			glVertex3f(7, x, -7);
 			glVertex3f(7, x, 7);
-			glEnd();
-		}
-		for (int x = -7; x <= 7; x++) {
-			glBegin(GL_LINE_LOOP);
+		glEnd();
+	}
+	for (int x = -7; x <= 7; x++) {
+		glBegin(GL_LINE_LOOP);
 			glVertex3f(7, -7, x);
 			glVertex3f(7, 7, x);
-			glEnd();
-		}
+		glEnd();
+	}
 }
 
 void foodpar(float x1, float x2, float y1, float y2, float z1, float z2){
@@ -379,9 +390,7 @@ void set_msg(float x, float y, void *font, char *string)
 {
 	glColor3f(1.0, 1.0, 1.0);
 	glRasterPos2f(x, y);
-	int len, i;
-	len = (int)strlen(string);
-	for (i = 0; i < len; i++) {
+	for (int i = 0; i < (int)strlen(string); i++) {
 		glutBitmapCharacter(font, string[i]);
 	}
 }
@@ -391,17 +400,12 @@ void display_msg(){
 	stringstream strs2;
 	strs1 << sc;
 	strs2 << level_str;
-	string temp_sc = strs1.str();
-	string temp_level = strs2.str();
 	string sc_str = "Score : ";
 	string Level = "Level : ";
-	sc_str.append(temp_sc);
-	Level.append(temp_level);
-	char* char_sc = (char *) sc_str.c_str();
-	char* char_level = (char *) Level.c_str();
-	char* char_cheat = (char *) cheat_str.c_str();
-	set_msg(15.0, 13.0, font2, (char *) char_sc);
-	set_msg(15.0, 11.0, font2, (char *) char_level);
+	sc_str.append(strs1.str());
+	Level.append(strs2.str());
+	set_msg( 15.0, 13.0, font2, (char *) sc_str.c_str());
+	set_msg( 15.0, 11.0, font2, (char *) Level.c_str());
 	set_msg(-20.0, 13.0, font1, (char *) "w - UP");
 	set_msg(-20.0, 11.0, font1, (char *) "s - DOWN");
 	set_msg(-20.0, 9.0, font1, (char *) "a - LEFT");
@@ -409,8 +413,8 @@ void display_msg(){
 	set_msg(-20.0, 5.0, font1, (char *) "r - RESTART");
 	set_msg(-20.0, 3.0, font1, (char *) "esc - ESC");
 	set_msg(-20.0, 1.0, font1, (char *) "c - CHEAT: ");
-	set_msg(-12.5, 1.0, font2, (char *) char_cheat);
-	}
+	set_msg(-13.0, 1.0, font2, (char *) cheat_str.c_str());
+}
 
 void display(void)
 {
@@ -419,11 +423,11 @@ void display(void)
 	glLoadIdentity ();
 	glTranslatef(0.0, 0.0, -40.0);
 	display_msg();
+	drawRectangle(0.7, 3.0);
 	//rotate around Y axis
 	if (current_face == 0) {
 		glRotatef(snake->y * 6.43, 1.0, 0.0, 0.0);
 		glRotatef(-snake->x * 6.43, 0.0, 1.0, 0.0);
-		
 	}
 	else if (current_face == 1) {
 		glRotatef(-90 , 0.0, 1.0, 0.0);
@@ -444,7 +448,6 @@ void display(void)
 	glPushMatrix();
 		drawmap();
 		glPushMatrix();
-			int i;
 			sq *p = snake;
 			while(p != NULL){
 				if (p->snake_face == 0){
@@ -473,7 +476,7 @@ void display(void)
 			glutSwapBuffers();
 		glPopMatrix();
 	glPopMatrix();
-
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 void set_level(int score) {
 	if (sc > 5){
@@ -681,7 +684,7 @@ void light()
 
 int main(int argc, char** argv)
 {
-	string s("800x600:16@16");
+	string s("1000x800:16@16");
 	glutInit(&argc,argv);
 	glutInitDisplayMode ( GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutGameModeString(s.c_str());
