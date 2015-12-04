@@ -59,6 +59,7 @@ const float BODY_LENGTH = 1.6;
 const float LEFT_LEG_LENGTH = 1.7;
 const float RIGHT_LEG_LENGTH = 0.6;
 const float RIGHT_FORELEG_LENGTH = 1.2;
+const float SWORD_HANDLE = 0.6;
 
 bool p = false;
 bool cheat = false;
@@ -74,6 +75,10 @@ void drawBody();
 void drawLine(float length);
 void drawBullet();
 void drawEnemy();
+void drawSword();
+void set_level();
+void set_everything();
+void set_over_msg();
 
 void drawCube(float x1, float x2, float y1, float y2, float z1, float z2)
 {
@@ -112,7 +117,8 @@ void drawCube(float x1, float x2, float y1, float y2, float z1, float z2)
 	glEnd();
 }
 
-void drawRectangle(float width, float length) {
+void drawRectangle(float width, float length) 
+{
 	glBegin(GL_POLYGON);
 		glColor3f(1.0, 1.0, 1.0);
 		glNormal3f(0.0, 0.0, 1.0);
@@ -218,7 +224,6 @@ void drawEnemy()
 		drawLine(RIGHT_FOREARM_LENGTH);
 	glPopMatrix();
 	glPushMatrix();
-	
 		glTranslatef(0.0, -HEAD_RADIUS - BODY_LENGTH, 0.0);
 		glRotatef(110.0, 0.0, 0.0, 1.0);
 		drawLine(LEFT_LEG_LENGTH);
@@ -228,21 +233,52 @@ void drawEnemy()
 		glRotatef(45.0, 0.0, 0.0, 1.0);
 		drawLine(RIGHT_FORELEG_LENGTH);
 	glPopMatrix();
-	//right arm
+	//left arm
 	glPushMatrix();
 		glTranslatef(0.0, -HEAD_RADIUS, 0.0);
-		glRotatef(right_arm_degree, 0.0, 0.0, 1.0);
+		glRotatef(70, 0.0, 0.0, 1.0);
 		drawLine(RIGHT_ARM_LENGTH);
 		glTranslatef(-RIGHT_ARM_LENGTH, 0.0, 0.0);
-		glRotatef(right_forearm_degree, 0.0, 0.0, 1.0);
+		glRotatef(-15, 0.0, 0.0, 1.0);
 		drawLine(RIGHT_FOREARM_LENGTH);
-		//right arm
-		glTranslatef(-RIGHT_FOREARM_LENGTH, 0.15, 0.0);
-		glRotatef(90.0, 0.0, 0.0, 1.0);
-		glLineWidth(10.0);
-		drawLine(0.5);
-		//knife
+		//sword
+		glLineWidth(2.5);
+		glTranslatef(-RIGHT_FOREARM_LENGTH, -0.2, 0.0);
+		glRotatef(-90.0, 0.0, 0.0, 1.0);
+		//drawLine(0.6);
+		//glTranslatef(-0.6, 0.0, 0.0);
+		//glRotatef(45, 0.0, 0.0, 1.0);
+		//drawLine(0.6);
+		//glRotatef(-90, 0.0, 0.0, 1.0);
+		//drawLine(0.6);
+		drawSword();
 	glPopMatrix();
+}
+
+void drawSword()
+{
+	glBegin(GL_LINES);
+		//handle
+		drawLine(SWORD_HANDLE);
+		glTranslatef(-SWORD_HANDLE, 0.0, 0.0);
+		glRotatef(45.0, 0.0, 0.0, 1.0);
+		drawLine(SWORD_HANDLE);
+		glRotatef(-90.0, 0.0, 0.0, 1.0);
+		drawLine(SWORD_HANDLE);
+		//body
+		glTranslatef(-SWORD_HANDLE + 0.3, 0.0, 0.0);
+		glRotatef(45.0, 0.0, 0.0, 1.0);
+		drawLine(2.5);
+		glTranslatef(-2.5, 0.0, 0.0);
+		glRotatef(45.0, 0.0, 0.0, 1.0);
+		drawLine(0.4);
+		glTranslatef(-0.4, 0.0, 0.0);
+		glRotatef(100.0, 0.0, 0.0, 1.0);
+		drawLine(0.4);
+		glTranslatef(-0.4, 0.0, 0.0);
+		glRotatef(37.0, 0.0, 0.0, 1.0);
+		drawLine(2.5);
+	glEnd();
 }
 
 void add(int x, int y, int z, int snake_face)
@@ -512,7 +548,8 @@ void drawmap(){
 	}
 }
 
-void foodpar(float x1, float x2, float y1, float y2, float z1, float z2){
+void foodpar(float x1, float x2, float y1, float y2, float z1, float z2)
+{
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	if (fface == 0) {
 		z2 ++;
@@ -529,7 +566,8 @@ void foodpar(float x1, float x2, float y1, float y2, float z1, float z2){
 	drawCube(x1, x2, y1, y2, z1, z2);
 }
 
-void par(float x1, float x2, float y1, float y2, float z1, float z2){
+void par(float x1, float x2, float y1, float y2, float z1, float z2)
+{
 	glColor3f(1.0, 1.0, 1.0);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	drawCube(x1, x2, y1, y2, z1, z2);
@@ -644,76 +682,68 @@ void display(void)
 	glPopMatrix();
 }
 
-void set_level(int score) {
+void set_over_msg() 
+{
+	cout << "\nGame Over!!!!\n";
+	cout << "Your final Score is ";
+	cout << sc << endl;
+	cout << "You survived ";
+	cout << level_str;
+	cout << " round\n" << endl;
+}
+
+void set_level() 
+{
+	if (sc % 5 == 0){
+		right_arm_degree = 110;
+		right_forearm_degree = 15;
+	}
 	if (sc == 5){
 		level = 1.5;
 		level_str = 2;
-		right_arm_degree = 110;
-		right_forearm_degree = 15;
 	} 
 	if (sc == 10) {
 		level = 2.0;
 		level_str = 3;
-		right_arm_degree = 110;
-		right_forearm_degree = 15;
 	}
 	if (sc == 15) {
 		level = 2.5;
 		level_str = 4;
-		right_arm_degree = 110;
-		right_forearm_degree = 15;
 	}
 	if (sc == 20) {
 		level = 3.0;
 		level_str = 5;
-		right_arm_degree = 110;
-		right_forearm_degree = 15;
 	}
 }
+
+
 
 void myIdleFunc(int a) {
 	if(!p){
 		if(!cheat && tail()) {
-			cout << "\nGame Over!!!!\n";
-			cout << "Your final Score is ";
-			cout << sc << endl;
-			cout << "You survived ";
-			cout << level_str;
-			cout << " round\n" << endl;
+			set_over_msg(); 
 			exit(0);
 		} else if(sc >= 2300) {
 			cout << "\nyou win!\n" << endl;
 			exit(0);
 		} else{ 
 			if ( (fface == 0) && (snake -> x + mx == fx && snake -> y + my == fy && snake -> z + mz == fz) ) {
-				add(fx, fy, fz , snake->snake_face);	
-				sc++;
-				right_forearm_degree += 6.8;
-				right_arm_degree += 6.8;
-				set_f();
+				add(fx, fy, fz , snake->snake_face);
+				set_everything();
 			}
 			else if ( (fface == 1) && (snake -> x + mx == fx && snake -> y + my == fy && snake -> z + mz  == fz) ) {
 				add(fx, fy, fz, snake->snake_face);	
-				sc++;
-				right_forearm_degree += 6.8;
-				right_arm_degree += 6.8;
-				set_f();
+				set_everything();
 			}
 			else if ( (fface == 2) && (snake -> x + mx == fx && snake -> y + my == fy && snake -> z + mz + 1 == fz) ) {
 				add(fx, fy, fz - 1, snake->snake_face);	
-				sc++;
-				right_forearm_degree += 6.8;
-				right_arm_degree += 6.8;
-				set_f();
+				set_everything();
 			}	
 			else if ( (fface == 3) && (snake -> x + mx + 1 == fx && snake -> y + my == fy && snake -> z + mz == fz) ) {
 				add(fx - 1, fy, fz, snake->snake_face);	
-				sc++;
-				right_forearm_degree += 6.8;
-				right_arm_degree += 6.8;
-				set_f();
+				set_everything();
 			} 
-			set_level(sc);
+			set_level();
 		}
 		move();
 		if ((sc != 0) && (sc % 4 == 0)) {
@@ -725,6 +755,14 @@ void myIdleFunc(int a) {
 		glutPostRedisplay();
 	}
 	glutTimerFunc(100/level, myIdleFunc, 0);
+}
+
+void set_everything()
+{
+	sc++;
+	right_forearm_degree += 6.8;
+	right_arm_degree += 6.8;
+	set_f();
 }
 
 void init()
@@ -748,7 +786,10 @@ void Reshape(int w, int h)
 
 void keyboard(unsigned char key, int x, int y)
 {
-	if(key == 27) exit(0);	
+	if(key == 27) {
+		set_over_msg();
+		exit(0);
+	}
 	else if( (char)key == 'a' ){
 		if(!p) {
 			if ( (current_face == 0) && (mx != 1) ) {
