@@ -164,12 +164,13 @@ void set_f(){
 		}
 		sq *p = snake;
 		while(p != NULL){
-			if (snake->x + mx == fx || snake->y + my == fy || snake->z + mz ==fz){
+			if (snake->x + mx == fx || snake->y + my == fy 
+				|| snake->z + mz ==fz) {
 				f = true;
 				break;
 			}
-			if( (p -> x == fx || p -> x == -fx) && (p -> y == fy || p -> y == -fy) 
-				&& (p -> z == fz || p -> z == -fz) ){
+			if( (p -> x == fx || p -> x == -fx) && (p -> y == fy 
+				|| p -> y == -fy) && (p -> z == fz || p -> z == -fz) ){
 				f = true;
 				break;		
 			}	
@@ -423,61 +424,66 @@ void display(void)
 	glLoadIdentity ();
 	glTranslatef(0.0, 0.0, -40.0);
 	display_msg();
-	drawRectangle(0.7, 3.0);
-	//rotate around Y axis
-	if (current_face == 0) {
-		glRotatef(snake->y * 6.43, 1.0, 0.0, 0.0);
-		glRotatef(-snake->x * 6.43, 0.0, 1.0, 0.0);
-	}
-	else if (current_face == 1) {
-		glRotatef(-90 , 0.0, 1.0, 0.0);
-		glRotatef(snake->z * 6.43, 0.0, 1.0, 0.0);
-		glRotatef(-snake->y * 6.43, 0.0, 0.0, 1.0);	
-	}
-	else if (current_face == 2) {
-		glRotatef(180 , 0.0, 1.0, 0.0);
-		glRotatef(-snake->y * 6.43, 1.0, 0.0, 0.0);
-		glRotatef(snake->x * 6.43, 0.0, 1.0, 0.0);	
-	}
-	else if (current_face == 3) {
-		glRotatef(90 , 0.0, 1.0, 0.0);
-		glRotatef(-snake->z * 6.43, 0.0, 1.0, 0.0);
-		glRotatef(snake->y * 6.43, 0.0, 0.0, 1.0);
-	}
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glPushMatrix();
-		drawmap();
+		glTranslatef(0.0, -15.0, 0.0);
+		drawRectangle(50.0, 0.2);
+	glPopMatrix();
+	//rotate around Y axis
+	glPushMatrix();
+		if (current_face == 0) {
+			glRotatef(snake->y * 6.43, 1.0, 0.0, 0.0);
+			glRotatef(-snake->x * 6.43, 0.0, 1.0, 0.0);
+		}
+		else if (current_face == 1) {
+			glRotatef(-90 , 0.0, 1.0, 0.0);
+			glRotatef(snake->z * 6.43, 0.0, 1.0, 0.0);
+			glRotatef(-snake->y * 6.43, 0.0, 0.0, 1.0);	
+		}
+		else if (current_face == 2) {
+			glRotatef(180 , 0.0, 1.0, 0.0);
+			glRotatef(-snake->y * 6.43, 1.0, 0.0, 0.0);
+			glRotatef(snake->x * 6.43, 0.0, 1.0, 0.0);	
+		}
+		else if (current_face == 3) {
+			glRotatef(90 , 0.0, 1.0, 0.0);
+			glRotatef(-snake->z * 6.43, 0.0, 1.0, 0.0);
+			glRotatef(snake->y * 6.43, 0.0, 0.0, 1.0);
+		}
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glPushMatrix();
-			sq *p = snake;
-			while(p != NULL){
-				if (p->snake_face == 0){
-					par((p -> x), (p -> x) + 1, (p -> y), (p -> y) + 1, p -> z, p -> z);
-					p = p -> next;
+			drawmap();
+			glPushMatrix();
+				sq *p = snake;
+				while(p != NULL){
+					if (p->snake_face == 0){
+						par((p -> x), (p -> x) + 1, (p -> y), (p -> y) + 1, p -> z, p -> z);
+						p = p -> next;
+					}
+					else if (p->snake_face == 1){
+						par((p -> x), (p -> x), (p -> y), (p -> y) + 1, p -> z, p -> z + 1);
+						p = p->next;
+					}
+					else if (p->snake_face == 2){
+						par((p -> x), (p -> x) + 1, (p -> y), (p -> y) + 1, p -> z + 1, p -> z + 1);
+						p = p->next;
+					}
+					else if (p->snake_face == 3) {
+						par((p -> x) + 1, (p -> x) + 1, (p -> y), (p -> y) + 1, p -> z, p -> z + 1);
+						p = p->next;
+					}				
 				}
-				else if (p->snake_face == 1){
-					par((p -> x), (p -> x), (p -> y), (p -> y) + 1, p -> z, p -> z + 1);
-					p = p->next;
+				if ( (fface == 0) || (fface == 2) ) {
+					foodpar(fx, fx + 1, fy, fy + 1, fz, fz);
 				}
-				else if (p->snake_face == 2){
-					par((p -> x), (p -> x) + 1, (p -> y), (p -> y) + 1, p -> z + 1, p -> z + 1);
-					p = p->next;
+				else if ( (fface == 1)||(fface == 3) ) {
+					foodpar(fx, fx, fy, fy + 1, fz, fz + 1);
 				}
-				else if (p->snake_face == 3) {
-					par((p -> x) + 1, (p -> x) + 1, (p -> y), (p -> y) + 1, p -> z, p -> z + 1);
-					p = p->next;
-				}				
-			}
-			if ( (fface == 0) || (fface == 2) ) {
-				foodpar(fx, fx + 1, fy, fy + 1, fz, fz);
-			}
-			else if ( (fface == 1)||(fface == 3) ) {
-				foodpar(fx, fx, fy, fy + 1, fz, fz + 1);
-			}
-			glutSwapBuffers();
+				glutSwapBuffers();
+			glPopMatrix();
 		glPopMatrix();
 	glPopMatrix();
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
+
 void set_level(int score) {
 	if (sc > 5){
 		level = 1.5;
