@@ -14,6 +14,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sstream>
+#include <math.h>
 
 
 using namespace std;
@@ -43,8 +44,17 @@ int fface = 0;
 int sc = 0;
 int current_face = 0; //0 for default
 int level_str = 1.0;
-
+float PI = 3.14159;
 float level = 1.0;
+const float LINE_WIDTH = 2.5;
+const float HEAD_RADIUS = 0.4;
+const float ARM_LENGTH = 0.6;
+const float FOREARM_LENGTH = 1.2;
+const float BODY_LENGTH = 1.6;
+const float LEFT_LEG_LENGTH = 1.7;
+const float RIGHT_LEG_LENGTH = 0.6;
+const float RIGHT_FORELEG_LENGTH = 1.2;
+
 bool p = false;
 bool cheat = false;
 string cheat_str = "Off";
@@ -54,6 +64,9 @@ void *font2 = GLUT_BITMAP_HELVETICA_18;
 void light();
 void drawCube(float x1, float x2, float y1, float y2, float z1, float z2);
 void drawRectangle(float width, float length);
+void drawHead(float radius);
+void drawBody();
+void drawLine(float length);
 
 void drawCube(float x1, float x2, float y1, float y2, float z1, float z2){
 	glBegin(GL_QUADS);
@@ -94,12 +107,53 @@ void drawCube(float x1, float x2, float y1, float y2, float z1, float z2){
 void drawRectangle(float width, float length) {
 	glBegin(GL_POLYGON);
 		glColor3f(1.0, 1.0, 1.0);
-		glNormal3f(0.0, 1.0, 0.0);
+		glNormal3f(0.0, 0.0, 1.0);
 		glVertex3f(-width/2, -length/2, 0.0);
 		glVertex3f( width/2, -length/2, 0.0);
 		glVertex3f( width/2,  length/2, 0.0);
 		glVertex3f(-width/2,  length/2, 0.0);
 	glEnd();
+}
+
+void drawHead(float radius)
+{
+    glBegin(GL_LINE_LOOP);
+    for(int i = 0; i < 360; i++)
+        glVertex2f(radius * cos(2 * PI / 360 * i), radius * sin(2 * PI / 360 * i));
+    	glNormal3f(0.0, 0.0, 1.0);
+    glEnd();
+}
+
+void drawLine(float length){
+	glBegin(GL_LINES);
+		glVertex3f(-length, 0.0, 0.0);
+		glVertex3f(0.0, 0.0, 0.0);
+	glEnd();
+}
+
+void drawBody() {
+	glColor3f(1.0, 1.0, 1.0);
+	glPushMatrix();
+		glTranslatef(0.0, -HEAD_RADIUS, 0.0);
+		glRotatef(90.0, 0.0, 0.0, 1.0);
+		drawLine(BODY_LENGTH);
+		glRotatef(-45, 0.0, 0.0, 1.0);
+		drawLine(ARM_LENGTH);
+		glTranslatef(-ARM_LENGTH, 0.0, 0.0);
+		glRotatef(45, 0.0, 0.0, 1.0);
+		drawLine(FOREARM_LENGTH);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(0.0, -HEAD_RADIUS - BODY_LENGTH, 0.0);
+		glRotatef(70.0, 0.0, 0.0, 1.0);
+		drawLine(LEFT_LEG_LENGTH);
+		glRotatef(65.0, 0.0, 0.0, 1.0);
+		drawLine(RIGHT_LEG_LENGTH);
+		glTranslatef(-RIGHT_LEG_LENGTH, 0.0, 0.0);
+		glRotatef(-45.0, 0.0, 0.0, 1.0);
+		drawLine(RIGHT_FORELEG_LENGTH);
+	glPopMatrix();
+
 }
 
 void add(int x, int y, int z, int snake_face){
@@ -421,14 +475,21 @@ void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity ();
+	glLoadIdentity();
 	glTranslatef(0.0, 0.0, -40.0);
 	display_msg();
 	glPushMatrix();
 		glTranslatef(0.0, -15.0, 0.0);
 		drawRectangle(50.0, 0.2);
+		glPushMatrix();
+			glTranslatef(-15.0, 3.7, 0.0);
+			glLineWidth(LINE_WIDTH);
+			drawHead(HEAD_RADIUS);
+			drawBody();
+		glPopMatrix();
 	glPopMatrix();
 	//rotate around Y axis
+	glLineWidth(1.0);
 	glPushMatrix();
 		if (current_face == 0) {
 			glRotatef(snake->y * 6.43, 1.0, 0.0, 0.0);
@@ -654,7 +715,7 @@ void keyboard(unsigned char key, int x, int y)
 		if(p) p = false;
 		else p = true;	
 	} else if( (char)key == 'r' ){
-		if( (-7 < snake->x <= 8) && (-7 < snake->z <= 8) ) start();
+		if( ((-7 < snake->x) <= 8) && ((-7 < snake->z) <= 8) ) start();
 	} else if( (char)key == 'c' ){
 		if(!cheat) {
 			cheat = true;
