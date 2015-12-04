@@ -46,10 +46,15 @@ int current_face = 0; //0 for default
 int level_str = 1.0;
 float PI = 3.14159;
 float level = 1.0;
+float right_arm_degree = 110;
+float right_forearm_degree = 15;
+float bullet_trace = -0.8;
 const float LINE_WIDTH = 2.5;
 const float HEAD_RADIUS = 0.4;
-const float ARM_LENGTH = 0.6;
-const float FOREARM_LENGTH = 1.2;
+const float LEFT_ARM_LENGTH = 0.6;
+const float LEFT_FOREARM_LENGTH = 1.2;
+const float RIGHT_ARM_LENGTH = 0.6;
+const float RIGHT_FOREARM_LENGTH = 1.2;
 const float BODY_LENGTH = 1.6;
 const float LEFT_LEG_LENGTH = 1.7;
 const float RIGHT_LEG_LENGTH = 0.6;
@@ -67,8 +72,11 @@ void drawRectangle(float width, float length);
 void drawHead(float radius);
 void drawBody();
 void drawLine(float length);
+void drawBullet();
+void drawEnemy();
 
-void drawCube(float x1, float x2, float y1, float y2, float z1, float z2){
+void drawCube(float x1, float x2, float y1, float y2, float z1, float z2)
+{
 	glBegin(GL_QUADS);
 		// glNormal3f();
 		glVertex3f(x1, y2, z2);
@@ -124,24 +132,40 @@ void drawHead(float radius)
     glEnd();
 }
 
-void drawLine(float length){
+void drawBullet()
+{
+	glBegin(GL_POLYGON);
+		glColor3f(1.0, 1.0, 1.0);
+		glNormal3f(0.0, 0.0, 1.0);
+		glVertex3f( 1.0,  1.0, 0.0);
+		glVertex3f(-1.0,  1.0, 0.0);
+		glVertex3f(-1.5,  0.0, 0.0);
+		glVertex3f(-1.0, -1.0, 0.0);
+		glVertex3f( 1.0, -1.0, 0.0);
+	glEnd();
+}
+
+void drawLine(float length)
+{
 	glBegin(GL_LINES);
 		glVertex3f(-length, 0.0, 0.0);
 		glVertex3f(0.0, 0.0, 0.0);
 	glEnd();
 }
 
-void drawBody() {
+void drawBody() 
+{
 	glColor3f(1.0, 1.0, 1.0);
 	glPushMatrix();
+		drawHead(HEAD_RADIUS);
 		glTranslatef(0.0, -HEAD_RADIUS, 0.0);
 		glRotatef(90.0, 0.0, 0.0, 1.0);
 		drawLine(BODY_LENGTH);
 		glRotatef(-45, 0.0, 0.0, 1.0);
-		drawLine(ARM_LENGTH);
-		glTranslatef(-ARM_LENGTH, 0.0, 0.0);
+		drawLine(LEFT_ARM_LENGTH);
+		glTranslatef(-LEFT_ARM_LENGTH, 0.0, 0.0);
 		glRotatef(45, 0.0, 0.0, 1.0);
-		drawLine(FOREARM_LENGTH);
+		drawLine(LEFT_FOREARM_LENGTH);
 	glPopMatrix();
 	glPushMatrix();
 		glTranslatef(0.0, -HEAD_RADIUS - BODY_LENGTH, 0.0);
@@ -153,10 +177,76 @@ void drawBody() {
 		glRotatef(-45.0, 0.0, 0.0, 1.0);
 		drawLine(RIGHT_FORELEG_LENGTH);
 	glPopMatrix();
-
+	//right arm
+	glPushMatrix();
+		glTranslatef(0.0, -HEAD_RADIUS, 0.0);
+		glRotatef(right_arm_degree, 0.0, 0.0, 1.0);
+		drawLine(RIGHT_ARM_LENGTH);
+		glTranslatef(-RIGHT_ARM_LENGTH, 0.0, 0.0);
+		glRotatef(right_forearm_degree, 0.0, 0.0, 1.0);
+		drawLine(RIGHT_FOREARM_LENGTH);
+		//right arm
+		glTranslatef(-RIGHT_FOREARM_LENGTH, 0.15, 0.0);
+		glRotatef(90.0, 0.0, 0.0, 1.0);
+		glLineWidth(10.0);
+		drawLine(0.5);
+		//gun
+		glTranslatef(-0.5, 0.0, 0.0);
+		glRotatef(-90.0, 0.0, 0.0, 1.0);
+		drawLine(0.7);
+		//bullet
+		glTranslatef(bullet_trace, 0.0, 0.0);
+		glScalef(0.2, 0.1, 0.0);
+		drawBullet();
+	glPopMatrix();
 }
 
-void add(int x, int y, int z, int snake_face){
+void drawEnemy()
+{
+	glColor3f(1.0, 0.0, 0.0);
+	glPushMatrix();
+		//head
+		drawHead(HEAD_RADIUS);
+		glTranslatef(0.0, -HEAD_RADIUS, 0.0);
+		glRotatef(90.0, 0.0, 0.0, 1.0);
+		//right arm
+		drawLine(BODY_LENGTH);
+		glRotatef(45, 0.0, 0.0, 1.0);
+		drawLine(RIGHT_ARM_LENGTH);
+		glTranslatef(-RIGHT_ARM_LENGTH, 0.0, 0.0);
+		glRotatef(-45, 0.0, 0.0, 1.0);
+		drawLine(RIGHT_FOREARM_LENGTH);
+	glPopMatrix();
+	glPushMatrix();
+	
+		glTranslatef(0.0, -HEAD_RADIUS - BODY_LENGTH, 0.0);
+		glRotatef(110.0, 0.0, 0.0, 1.0);
+		drawLine(LEFT_LEG_LENGTH);
+		glRotatef(-65.0, 0.0, 0.0, 1.0);
+		drawLine(RIGHT_LEG_LENGTH);
+		glTranslatef(-RIGHT_LEG_LENGTH, 0.0, 0.0);
+		glRotatef(45.0, 0.0, 0.0, 1.0);
+		drawLine(RIGHT_FORELEG_LENGTH);
+	glPopMatrix();
+	//right arm
+	glPushMatrix();
+		glTranslatef(0.0, -HEAD_RADIUS, 0.0);
+		glRotatef(right_arm_degree, 0.0, 0.0, 1.0);
+		drawLine(RIGHT_ARM_LENGTH);
+		glTranslatef(-RIGHT_ARM_LENGTH, 0.0, 0.0);
+		glRotatef(right_forearm_degree, 0.0, 0.0, 1.0);
+		drawLine(RIGHT_FOREARM_LENGTH);
+		//right arm
+		glTranslatef(-RIGHT_FOREARM_LENGTH, 0.15, 0.0);
+		glRotatef(90.0, 0.0, 0.0, 1.0);
+		glLineWidth(10.0);
+		drawLine(0.5);
+		//knife
+	glPopMatrix();
+}
+
+void add(int x, int y, int z, int snake_face)
+{
 	sq *tmp = (sq *)malloc(sizeof(sq));
 	tmp -> x = x;
 	tmp -> y = y;
@@ -175,7 +265,8 @@ void add(int x, int y, int z, int snake_face){
 	snake = tmp;
 }
 
-void start(){
+void start()
+{
 	free(snake);
 	sc = 0;
 	snake = NULL;
@@ -191,7 +282,8 @@ void start(){
 	current_face = 0;
 }
 
-void set_f(){
+void set_f()
+{
 	bool f = true;
 	srand(time(NULL));
 	while(f){
@@ -234,7 +326,8 @@ void set_f(){
 	}
 }
 
-bool tail(){
+bool tail()
+{
 	sq *p = snake;
 	while(p -> next != NULL){
 		if(p -> next -> x == snake -> x && p -> next -> y == snake -> y
@@ -245,7 +338,8 @@ bool tail(){
 	return false;
 }
 
-void move(){
+void move()
+{
 	sq *p = snake;
 	int x = p -> x;
 	int y = p -> y;
@@ -481,11 +575,16 @@ void display(void)
 	glPushMatrix();
 		glTranslatef(0.0, -15.0, 0.0);
 		drawRectangle(50.0, 0.2);
+		//stickman
 		glPushMatrix();
 			glTranslatef(-15.0, 3.7, 0.0);
 			glLineWidth(LINE_WIDTH);
-			drawHead(HEAD_RADIUS);
 			drawBody();
+		glPopMatrix();
+		glPushMatrix();
+			glTranslatef( 15.0, 3.7, 0.0);
+			glLineWidth(2.0);
+			drawEnemy();
 		glPopMatrix();
 	glPopMatrix();
 	//rotate around Y axis
@@ -546,21 +645,29 @@ void display(void)
 }
 
 void set_level(int score) {
-	if (sc > 5){
+	if (sc == 5){
 		level = 1.5;
 		level_str = 2;
+		right_arm_degree = 110;
+		right_forearm_degree = 15;
 	} 
-	if (sc > 10) {
+	if (sc == 10) {
 		level = 2.0;
 		level_str = 3;
+		right_arm_degree = 110;
+		right_forearm_degree = 15;
 	}
-	if (sc > 15) {
+	if (sc == 15) {
 		level = 2.5;
 		level_str = 4;
+		right_arm_degree = 110;
+		right_forearm_degree = 15;
 	}
-	if (sc > 20) {
+	if (sc == 20) {
 		level = 3.0;
 		level_str = 5;
+		right_arm_degree = 110;
+		right_forearm_degree = 15;
 	}
 }
 
@@ -581,26 +688,40 @@ void myIdleFunc(int a) {
 			if ( (fface == 0) && (snake -> x + mx == fx && snake -> y + my == fy && snake -> z + mz == fz) ) {
 				add(fx, fy, fz , snake->snake_face);	
 				sc++;
+				right_forearm_degree += 6.8;
+				right_arm_degree += 6.8;
 				set_f();
 			}
 			else if ( (fface == 1) && (snake -> x + mx == fx && snake -> y + my == fy && snake -> z + mz  == fz) ) {
 				add(fx, fy, fz, snake->snake_face);	
 				sc++;
+				right_forearm_degree += 6.8;
+				right_arm_degree += 6.8;
 				set_f();
 			}
 			else if ( (fface == 2) && (snake -> x + mx == fx && snake -> y + my == fy && snake -> z + mz + 1 == fz) ) {
 				add(fx, fy, fz - 1, snake->snake_face);	
 				sc++;
+				right_forearm_degree += 6.8;
+				right_arm_degree += 6.8;
 				set_f();
 			}	
 			else if ( (fface == 3) && (snake -> x + mx + 1 == fx && snake -> y + my == fy && snake -> z + mz == fz) ) {
 				add(fx - 1, fy, fz, snake->snake_face);	
 				sc++;
+				right_forearm_degree += 6.8;
+				right_arm_degree += 6.8;
 				set_f();
 			} 
 			set_level(sc);
 		}
 		move();
+		if ((sc != 0) && (sc % 4 == 0)) {
+			bullet_trace -= 1.0;
+		}
+		if (bullet_trace < -20) {
+			bullet_trace = -0.8;
+		}
 		glutPostRedisplay();
 	}
 	glutTimerFunc(100/level, myIdleFunc, 0);
