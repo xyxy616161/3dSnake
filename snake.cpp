@@ -44,6 +44,7 @@ int fface = 0;
 int sc = 0;
 int current_face = 0; //0 for default
 int level_str = 1.0;
+int bullet_flag = 0;
 float PI = 3.14159;
 float level = 1.0;
 float right_arm_degree = 110;
@@ -245,12 +246,6 @@ void drawEnemy()
 		glLineWidth(2.5);
 		glTranslatef(-RIGHT_FOREARM_LENGTH, -0.2, 0.0);
 		glRotatef(-90.0, 0.0, 0.0, 1.0);
-		//drawLine(0.6);
-		//glTranslatef(-0.6, 0.0, 0.0);
-		//glRotatef(45, 0.0, 0.0, 1.0);
-		//drawLine(0.6);
-		//glRotatef(-90, 0.0, 0.0, 1.0);
-		//drawLine(0.6);
 		drawSword();
 	glPopMatrix();
 }
@@ -746,16 +741,23 @@ void myIdleFunc(int a) {
 			set_level();
 		}
 		move();
-		if ((sc != 0) && (sc % 4 == 0)) {
-			bullet_trace -= 1.0;
+		if ((sc != 1) && (sc % 5 == 4)) {
+			bullet_flag = 1;
 		}
-		if (bullet_trace < -20) {
+		
+		if (bullet_flag == 1){
+			bullet_trace -= 1;
+		}
+		
+		if (bullet_trace < -40) {
 			bullet_trace = -0.8;
+			bullet_flag = 0;
 		}
 		glutPostRedisplay();
 	}
 	glutTimerFunc(100/level, myIdleFunc, 0);
 }
+
 
 void set_everything()
 {
