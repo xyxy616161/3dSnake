@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <sstream>
 #include <math.h>
+#include <time.h>
+#include <unistd.h>
 
 
 using namespace std;
@@ -51,6 +53,8 @@ int enemy_down_count = 20;
 int enemy_down_moving = 0;
 int enemy_down_rotation = 0;
 int kill_enemy_count = 0;
+int game_over_bool = 0;
+int game_over_flag = 0;
 float PI = 3.14159;
 float level = 1.0;
 float right_arm_degree = 110;
@@ -88,7 +92,7 @@ void drawEnemy(int status);
 void drawSword();
 void set_level();
 void set_everything();
-void set_over_msg();
+void set_over_msg(int game_over_flag);
 
 void drawCube(float x1, float x2, float y1, float y2, float z1, float z2)
 {
@@ -619,6 +623,8 @@ void display_msg(){
 	set_msg(-13.0, 1.0, font2, (char *) cheat_str.c_str());
 }
 
+
+
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -626,6 +632,13 @@ void display(void)
 	glLoadIdentity();
 	glTranslatef(0.0, 0.0, -40.0);
 	display_msg();
+	if (game_over_bool == 1) {
+		set_msg(0.0, 13.0, font1, (char *) "GAME OVER!");
+		usleep(2000000);
+		set_over_msg(game_over_flag);
+		exit(0);
+
+	}
 	glPushMatrix();
 		glTranslatef(0.0, -15.0, 0.0);
 		drawRectangle(50.0, 0.2);
@@ -757,8 +770,8 @@ void set_level()
 void myIdleFunc(int a) {
 	if(!p){
 		if(!cheat && tail()) {
-			set_over_msg(0); 
-			exit(0);
+			game_over_flag = 0;
+			game_over_bool = 1;
 		} else if(sc >= 2300) {
 			cout << "\nyou win!\n" << endl;
 			exit(0);
@@ -841,8 +854,8 @@ void myIdleFunc(int a) {
 				bullet_flag = 0;
 				}
 				else{
-					set_over_msg(1); 
-					exit(0);
+					game_over_flag = 1;
+					game_over_bool = 1;
 				}
 			}
 			enemy_moving_forward += 0.1;
@@ -987,27 +1000,7 @@ void keyboard(unsigned char key, int x, int y)
 	}
 }
 
-void light() 
-{
-	//emerald
-	//http://devernay.free.fr/cours/opengl/materials.html
-	GLfloat light_position[] = {fx, fy, fz, 1.0};
-	GLfloat materialAMB[] = {0.0215, 0.1745, 0.0215, 1.0};
-	GLfloat materialDIF[] = {0.07568, 0.61424, 0.07568, 1.0};
-	GLfloat materialSPE[] = {0.633, 0.727811, 0.633, 1.0};
-	GLfloat diffuseRGBA[] = {1.0f, 1.0f, 1.0f, 1.0f};
-	GLfloat specularRGBA[] = {1.0f, 1.0f, 1.0f, 1.0f};
-	glMaterialfv(GL_FRONT, GL_AMBIENT, materialAMB);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, materialDIF);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, materialSPE);
-	glMaterialf(GL_FRONT, GL_SHININESS, 0.6 * 128.0);
-	glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_DEPTH_TEST);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseRGBA);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specularRGBA);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-}
+
 
 int main(int argc, char** argv)
 {
