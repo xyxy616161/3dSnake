@@ -45,11 +45,18 @@ int sc = 0;
 int current_face = 0; //0 for default
 int level_str = 1.0;
 int bullet_flag = 0;
+int enemy_down_flag = 0;
+int enemy_down_count = 10;
+int enemy_down_moving = 0;
+int enemy_down_rotation = 0;
 float PI = 3.14159;
 float level = 1.0;
 float right_arm_degree = 110;
 float right_forearm_degree = 15;
 float bullet_trace = -0.8;
+float enemy_moving = 0;
+float enemy_moving_forward = 0;
+float sword_angle = 0;
 const float LINE_WIDTH = 2.5;
 const float HEAD_RADIUS = 0.4;
 const float LEFT_ARM_LENGTH = 0.6;
@@ -75,7 +82,7 @@ void drawHead(float radius);
 void drawBody();
 void drawLine(float length);
 void drawBullet();
-void drawEnemy();
+void drawEnemy(int status);
 void drawSword();
 void set_level();
 void set_everything();
@@ -208,7 +215,7 @@ void drawBody()
 	glPopMatrix();
 }
 
-void drawEnemy()
+void drawEnemy(int status)
 {
 	glColor3f(1.0, 0.0, 0.0);
 	glPushMatrix();
@@ -224,16 +231,23 @@ void drawEnemy()
 		glRotatef(-45, 0.0, 0.0, 1.0);
 		drawLine(RIGHT_FOREARM_LENGTH);
 	glPopMatrix();
+
 	glPushMatrix();
-		glTranslatef(0.0, -HEAD_RADIUS - BODY_LENGTH, 0.0);
-		glRotatef(110.0, 0.0, 0.0, 1.0);
-		drawLine(LEFT_LEG_LENGTH);
-		glRotatef(-65.0, 0.0, 0.0, 1.0);
-		drawLine(RIGHT_LEG_LENGTH);
-		glTranslatef(-RIGHT_LEG_LENGTH, 0.0, 0.0);
-		glRotatef(45.0, 0.0, 0.0, 1.0);
-		drawLine(RIGHT_FORELEG_LENGTH);
+		if (status == 1) {
+			glTranslatef(0.0, -HEAD_RADIUS - BODY_LENGTH, 0.0);
+			glRotatef(125.0 - (20 * sin(enemy_moving) + 20), 0.0, 0.0, 1.0);
+
+			drawLine(LEFT_LEG_LENGTH);
+			glRotatef(-(130.0 - (20 * sin(enemy_moving) + 20)), 0.0, 0.0, 1.0);
+			glRotatef(80 + (20 * sin(enemy_moving) + 20), 0.0, 0.0, 1.0);
+			drawLine(LEFT_LEG_LENGTH);
+			// glTranslatef(-RIGHT_LEG_LENGTH, 0.0, 0.0);
+			// glRotatef(45.0, 0.0, 0.0, 1.0);
+			// drawLine(RIGHT_FORELEG_LENGTH);
+		}
+		
 	glPopMatrix();
+
 	//left arm
 	glPushMatrix();
 		glTranslatef(0.0, -HEAD_RADIUS, 0.0);
@@ -245,7 +259,7 @@ void drawEnemy()
 		//sword
 		glLineWidth(2.5);
 		glTranslatef(-RIGHT_FOREARM_LENGTH, -0.2, 0.0);
-		glRotatef(-90.0, 0.0, 0.0, 1.0);
+		glRotatef(-90.0 + sword_angle, 0.0, 0.0, 1.0);
 		drawSword();
 	glPopMatrix();
 }
@@ -614,11 +628,21 @@ void display(void)
 			glLineWidth(LINE_WIDTH);
 			drawBody();
 		glPopMatrix();
+
 		glPushMatrix();
-			glTranslatef( 15.0, 3.7, 0.0);
+			glTranslatef( 15.0 - enemy_moving_forward, 3.7, 0.0);
 			glLineWidth(2.0);
-			drawEnemy();
+			if (enemy_down_flag == 1) {
+				glTranslatef(-enemy_down_moving, 3.7, 0.0);
+				glRotatef(enemy_down_rotation, 0.0, 0.0, 1.0);
+				drawEnemy(1);
+			}
+			else{
+				drawEnemy(1);
+			}
+			drawEnemy(1);
 		glPopMatrix();
+
 	glPopMatrix();
 	//rotate around Y axis
 	glLineWidth(1.0);
@@ -713,6 +737,7 @@ void set_level()
 
 
 
+
 void myIdleFunc(int a) {
 	if(!p){
 		if(!cheat && tail()) {
@@ -745,14 +770,56 @@ void myIdleFunc(int a) {
 			bullet_flag = 1;
 		}
 		
-		if (bullet_flag == 1){
+		if ( (bullet_flag == 1) and (enemy_down_flag == 0) ){
 			bullet_trace -= 1;
+
+			//ENEMY DOWN
+			if(enemy_moving_forward - bullet_trace >= 29){
+				enemy_down_flag = 1;
+				enemy_moving_forward = 0;
+				sword_angle = 0;
+				enemy_moving = 0;
+				bullet_trace = -0.8;
+				bullet_flag = 0;
+			}
 		}
 		
 		if (bullet_trace < -40) {
 			bullet_trace = -0.8;
 			bullet_flag = 0;
 		}
+
+		if ( (enemy_down_flag == 1) and (enemy_down_count > 0) ){
+			enemy_down_count -= 1;
+			enemy_down_moving -= 1;
+			enemy_down_rotation = enemy_down_count * 3.6;
+			if (enemy_down_count == 0) {
+				enemy_down_flag = 0;
+				enemy_down_count = 10;
+				enemy_down_rotation = 0;
+				enemy_down_moving = 0;
+			}
+		}
+
+		else{
+
+			if (enemy_moving >= 2 * PI) {
+				enemy_moving = 0;
+			}
+
+			enemy_moving += PI/10;
+
+			if (enemy_moving_forward >= 25.5) {
+				set_over_msg(); 
+				exit(0);
+			}
+			enemy_moving_forward += 0.1;
+			sword_angle += 0.15;
+
+		}
+
+		
+
 		glutPostRedisplay();
 	}
 	glutTimerFunc(100/level, myIdleFunc, 0);
@@ -915,7 +982,7 @@ void light()
 
 int main(int argc, char** argv)
 {
-	string s("1000x800:16@16");
+	string s("800x600:16@16");
 	glutInit(&argc,argv);
 	glutInitDisplayMode ( GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutGameModeString(s.c_str());
