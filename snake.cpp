@@ -47,9 +47,10 @@ int level_str = 1.0;
 int bullet_flag = 0;
 int bullet_shoot_flag = 0;
 int enemy_down_flag = 0;
-int enemy_down_count = 10;
+int enemy_down_count = 20;
 int enemy_down_moving = 0;
 int enemy_down_rotation = 0;
+int kill_enemy_count = 0;
 float PI = 3.14159;
 float level = 1.0;
 float right_arm_degree = 110;
@@ -595,14 +596,19 @@ void set_msg(float x, float y, void *font, char *string)
 void display_msg(){
 	stringstream strs1;
 	stringstream strs2;
+	stringstream strs3;
 	strs1 << sc;
 	strs2 << level_str;
+	strs3 << kill_enemy_count;
 	string sc_str = "Score : ";
 	string Level = "Level : ";
+	string enemy_kill = "Enemy Kill: ";
 	sc_str.append(strs1.str());
 	Level.append(strs2.str());
+	enemy_kill.append(strs3.str());
 	set_msg( 15.0, 13.0, font2, (char *) sc_str.c_str());
 	set_msg( 15.0, 11.0, font2, (char *) Level.c_str());
+	set_msg( 15.0, 9.0, font2, (char *) enemy_kill.c_str());
 	set_msg(-20.0, 13.0, font1, (char *) "w - UP");
 	set_msg(-20.0, 11.0, font1, (char *) "s - DOWN");
 	set_msg(-20.0, 9.0, font1, (char *) "a - LEFT");
@@ -706,13 +712,13 @@ void set_over_msg(int game_over_flag)
 {
 	cout << "\nGame Over!!!!\n";
 	if (game_over_flag == 0) {
-		cout << "You bited your tail ";
+		cout << "You bited your tail "<< endl;
 	}
 	else if (game_over_flag == 1) {
-		cout << "You are killed by enemy ";
+		cout << "You are killed by enemy "<< endl;
 	}
 	else{
-		cout << "You quited the game ";
+		cout << "You quited the game "<< endl;
 	}
 	cout << "Your final Score is ";
 	cout << sc << endl;
@@ -791,11 +797,11 @@ void myIdleFunc(int a) {
 			//ENEMY DOWN
 			if(enemy_moving_forward - bullet_trace >= 29){
 				enemy_down_flag = 1;
-				enemy_moving_forward = 0;
 				sword_angle = 0;
 				enemy_moving = 0;
 				bullet_trace = -0.8;
 				bullet_flag = 0;
+				kill_enemy_count += 1;
 			}
 		}
 		
@@ -806,13 +812,14 @@ void myIdleFunc(int a) {
 
 		if ( (enemy_down_flag == 1) and (enemy_down_count > 0) ){
 			enemy_down_count -= 1;
-			enemy_down_moving -= 1;
-			enemy_down_rotation = enemy_down_count * 3.6;
+			enemy_down_moving -= 4;
+			enemy_down_rotation = enemy_down_count * 36;
 			if (enemy_down_count == 0) {
 				enemy_down_flag = 0;
-				enemy_down_count = 10;
+				enemy_down_count = 20;
 				enemy_down_rotation = 0;
 				enemy_down_moving = 0;
+				enemy_moving_forward = 0;
 			}
 		}
 
@@ -825,16 +832,23 @@ void myIdleFunc(int a) {
 			enemy_moving += PI/10;
 
 			if (enemy_moving_forward >= 25.5) {
-				set_over_msg(1); 
-				exit(0);
+				if (cheat) {
+					enemy_down_flag = 1;
+					sword_angle = 0;
+					enemy_moving = 0;
+					bullet_trace = -0.8;
+					kill_enemy_count += 1;
+				bullet_flag = 0;
+				}
+				else{
+					set_over_msg(1); 
+					exit(0);
+				}
 			}
 			enemy_moving_forward += 0.1;
-			sword_angle += 0.15;
+			sword_angle += 0.13;
 
 		}
-
-		
-
 		glutPostRedisplay();
 	}
 	glutTimerFunc(100/level, myIdleFunc, 0);
