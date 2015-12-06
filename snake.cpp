@@ -45,6 +45,7 @@ int sc = 0;
 int current_face = 0; //0 for default
 int level_str = 1.0;
 int bullet_flag = 0;
+int bullet_shoot_flag = 0;
 int enemy_down_flag = 0;
 int enemy_down_count = 10;
 int enemy_down_moving = 0;
@@ -701,9 +702,18 @@ void display(void)
 	glPopMatrix();
 }
 
-void set_over_msg() 
+void set_over_msg(int game_over_flag) 
 {
 	cout << "\nGame Over!!!!\n";
+	if (game_over_flag == 0) {
+		cout << "You bited your tail ";
+	}
+	else if (game_over_flag == 1) {
+		cout << "You are killed by enemy ";
+	}
+	else{
+		cout << "You quited the game ";
+	}
 	cout << "Your final Score is ";
 	cout << sc << endl;
 	cout << "You survived ";
@@ -741,7 +751,7 @@ void set_level()
 void myIdleFunc(int a) {
 	if(!p){
 		if(!cheat && tail()) {
-			set_over_msg(); 
+			set_over_msg(0); 
 			exit(0);
 		} else if(sc >= 2300) {
 			cout << "\nyou win!\n" << endl;
@@ -766,11 +776,16 @@ void myIdleFunc(int a) {
 			set_level();
 		}
 		move();
-		if ((sc != 1) && (sc % 5 == 4)) {
+		if ((sc % 5 == 4) && (bullet_shoot_flag == 0)) {
 			bullet_flag = 1;
+			bullet_shoot_flag = 1;
+		}
+
+		if (sc % 5 == 0) {
+			bullet_shoot_flag = 0;
 		}
 		
-		if ( (bullet_flag == 1) and (enemy_down_flag == 0) ){
+		if ( (bullet_flag == 1) and (enemy_down_flag == 0) && (bullet_shoot_flag == 1)){
 			bullet_trace -= 1;
 
 			//ENEMY DOWN
@@ -810,7 +825,7 @@ void myIdleFunc(int a) {
 			enemy_moving += PI/10;
 
 			if (enemy_moving_forward >= 25.5) {
-				set_over_msg(); 
+				set_over_msg(1); 
 				exit(0);
 			}
 			enemy_moving_forward += 0.1;
@@ -856,7 +871,7 @@ void Reshape(int w, int h)
 void keyboard(unsigned char key, int x, int y)
 {
 	if(key == 27) {
-		set_over_msg();
+		set_over_msg(2);
 		exit(0);
 	}
 	else if( (char)key == 'a' ){
