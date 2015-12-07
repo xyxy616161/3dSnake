@@ -621,6 +621,11 @@ void display_msg(){
 	set_msg(-20.0, 3.0, font1, (char *) "esc - ESC");
 	set_msg(-20.0, 1.0, font1, (char *) "c - CHEAT: ");
 	set_msg(-13.0, 1.0, font2, (char *) cheat_str.c_str());
+
+	if (game_over_bool == 2) {
+		game_over_bool -= 1;
+		set_msg(-3.0, 12.0, font2, (char *) "GAME OVER!");
+	}
 }
 
 
@@ -631,14 +636,16 @@ void display(void)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glTranslatef(0.0, 0.0, -40.0);
-	display_msg();
+	
+
 	if (game_over_bool == 1) {
-		set_msg(0.0, 13.0, font1, (char *) "GAME OVER!");
+
 		usleep(2000000);
 		set_over_msg(game_over_flag);
 		exit(0);
 
 	}
+	display_msg();
 	glPushMatrix();
 		glTranslatef(0.0, -15.0, 0.0);
 		drawRectangle(50.0, 0.2);
@@ -723,21 +730,24 @@ void display(void)
 
 void set_over_msg(int game_over_flag) 
 {
-	cout << "\nGame Over!!!!\n";
+	cout << "\n          Game Over!!!!\n";
 	if (game_over_flag == 0) {
-		cout << "You bited your tail "<< endl;
+		cout << "          You bited your tail "<< endl;
 	}
 	else if (game_over_flag == 1) {
-		cout << "You are killed by enemy "<< endl;
+		cout << "          You are killed by enemy "<< endl;
 	}
 	else{
-		cout << "You quited the game "<< endl;
+		cout << "          You quited the game "<< endl;
 	}
-	cout << "Your final Score is ";
+	cout << "          Your final Score is ";
 	cout << sc << endl;
-	cout << "You survived ";
+	cout << "          You survived ";
 	cout << level_str;
-	cout << " round\n" << endl;
+	cout << " rounds" << endl;
+	cout << "          You killed ";
+	cout << kill_enemy_count;
+	cout << " enemies\n" << endl;
 }
 
 void set_level() 
@@ -771,7 +781,7 @@ void myIdleFunc(int a) {
 	if(!p){
 		if(!cheat && tail()) {
 			game_over_flag = 0;
-			game_over_bool = 1;
+			game_over_bool = 2;
 		} else if(sc >= 2300) {
 			cout << "\nyou win!\n" << endl;
 			exit(0);
@@ -855,7 +865,9 @@ void myIdleFunc(int a) {
 				}
 				else{
 					game_over_flag = 1;
-					game_over_bool = 1;
+					if (game_over_bool != 1) {
+						game_over_bool = 2;
+					}
 				}
 			}
 			enemy_moving_forward += 0.1;
